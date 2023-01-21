@@ -52,16 +52,26 @@ async function login(headers) {
   })
 }
 
-async function checkAvailableTimes(headers) {
-  fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/128.json?appointments[expedite]=false`, {
+async function checkAvailableDate(headers) {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/128.json?appointments[expedite]=false`, {
     "headers": Object.assign({}, headers, {
       "accept": "application/json",
       "x-requested-with": "XMLHttpRequest",
     })
   })
     .then(r => r.json())
-    .then(d => console.log(new Date().toString(), d[0]))
+    .then(d => d.length > 0 ? d[0]['date'] : null)
 
+}
+async function checkAvailableTime(headers, date) {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/128.json?date=${date}&appointments[expedite]=false`, {
+    "headers": Object.assign({}, headers, {
+      "accept": "application/json",
+      "x-requested-with": "XMLHttpRequest",
+    })
+  })
+    .then(r => r.json())
+    .then(d => d['business_times'][0] || d['available_times'][0])
 }
 
 async function main() {
@@ -70,7 +80,14 @@ async function main() {
       .then(defaultHeaders => login(defaultHeaders))
 
     while(true) {
-      await checkAvailableTimes(headers)
+      const date = await checkAvailableDate(headers)
+
+      let time = null
+      if (date) {
+        time = await checkAvailableTime(headers, date)
+      }
+
+      console.log(new Date().toString(), date, time)
       await sleep(30)
     }
 
