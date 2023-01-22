@@ -113,7 +113,7 @@ async function book(headers, date, time) {
   })
 }
 
-async function main() {
+async function main(nearestDate = null) {
   try {
     const headers = await fetch(`${BASE_URI}/users/sign_in`)
       .then(response => extractHeaders(response))
@@ -122,9 +122,6 @@ async function main() {
           'Cookie': await login(defaultHeaders).then(res => extractRelevantCookies(res))
         })
       ))
-
-
-    let nearestDate = null
 
     while(true) {
       const date = await checkAvailableDate(headers)
@@ -153,7 +150,7 @@ async function main() {
     console.error(err)
     console.info("Trying again in 1 minute")
     await sleep(60)
-    main()
+    main(nearestDate)
   }
 }
 
