@@ -134,7 +134,7 @@ async function main(nearestDate = null) {
       const date = await checkAvailableDate(sessionHeaders)
 
       if (date) {
-        if (!nearestDate || date < nearestDate) {
+        if (date < nearestDate) {
           nearestDate = date
           const time = await checkAvailableTime(sessionHeaders, date)
 
