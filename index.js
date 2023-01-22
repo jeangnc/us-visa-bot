@@ -131,8 +131,9 @@ async function main(nearestDate = null) {
 
         if (!nearestDate || parsedDate < nearestDate) {
           nearestDate = parsedDate
-          await checkAvailableTime(sessionHeaders, date)
-            .then(time => book(sessionHeaders, date, time))
+          const time = await checkAvailableTime(sessionHeaders, date)
+
+          book(sessionHeaders, date, time)
             .then(d => console.log(d))
 
           console.log(new Date().toString(), "booked time at", date, time)
