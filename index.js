@@ -12,7 +12,7 @@ const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
 
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
-    console.error(`Invalid current booked date ${currentBookedDate}`)
+    console.error(`Invalid current booked date: ${currentBookedDate}`)
     process.exit(1)
   }
 
