@@ -161,4 +161,11 @@ async function main(nearestDate = null) {
 }
 
 const args = process.argv.slice(2);
-main(args[0])
+const currentBookedDate = args[0]
+
+if (currentBookedDate) {
+  main(currentBookedDate)
+} else {
+  console.error('Missing current booked date. Usage: ./index.js <current booked date>')
+  process.exit(1)
+}
