@@ -32,6 +32,11 @@ async function extractHeaders(res) {
   }
 }
 
+function extractRelevantCookies(res) {
+  const parsedCookies = parseCookies(res.headers.get('set-cookie'))
+  return `_yatri_session=${parsedCookies['_yatri_session']}`
+}
+
 function parseCookies(cookies) {
   const parsedCookies = {}
 
@@ -41,11 +46,6 @@ function parseCookies(cookies) {
   })
 
   return parsedCookies
-}
-
-function extractRelevantCookies(res) {
-  const parsedCookies = parseCookies(res.headers.get('set-cookie'))
-  return `_yatri_session=${parsedCookies['_yatri_session']}`
 }
 
 async function login() {
