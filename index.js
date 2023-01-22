@@ -121,16 +121,25 @@ async function main() {
         })
       ))
 
+
+    let nearestDate = null
+
     while(true) {
       const date = await checkAvailableDate(headers)
 
       if (date) {
-        const time = await checkAvailableTime(headers, date)
+        const parsedDate = Date.parse(date)
 
-        await book(headers, date, time)
-          .then(d => console.log(d))
+        if (!nearestDate || parsedDate < nearestDate) {
+          nearestDate = parsedDate
+          await checkAvailableTime(headers, date)
+            .then(time => book(headers, date, time))
+            .then(d => console.log(d))
 
-        console.log(new Date().toString(), date, time)
+          console.log(new Date().toString(), "booked time at", date, time)
+        } else {
+          console.log(new Date().toString(), "nearest date is further than already booked", date)
+        }
       } else {
         console.log(new Date().toString(), "no dates available")
       }
