@@ -87,10 +87,12 @@ function checkAvailableTime(headers, date) {
 }
 
 async function book(headers, date, time) {
-  const newHeaders = await fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`, { "headers": headers })
+  const url = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
+
+  const newHeaders = await fetch(url, { "headers": headers })
     .then(response => extractHeaders(response))
 
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`, {
+  return fetch(url, {
     "method": "POST",
     "redirect": "follow",
     "headers": Object.assign({}, newHeaders, {
