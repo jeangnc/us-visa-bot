@@ -10,8 +10,8 @@ const FACILITY_ID = process.env.FACILITY_ID
 
 const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
 
-async function main(nearestDate = null) {
-  console.log(`Initializing with current nearest date ${nearestDate}`)
+async function main(currentBookedDate = null) {
+  console.log(`Initializing with current date ${currentBookedDate}`)
 
   try {
     const sessionHeaders = await login()
@@ -20,18 +20,16 @@ async function main(nearestDate = null) {
       const now = new Date().toString()
       const date = await checkAvailableDate(sessionHeaders)
 
-      if (date) {
-        if (date < nearestDate) {
-          nearestDate = date
-          const time = await checkAvailableTime(sessionHeaders, date)
-
-          book(sessionHeaders, date, time)
-            .then(d => console.log(now, "booked time at", date, time))
-        } else {
-          console.log(now, `nearest date is further than already booked (${nearestDate})`, date)
-        }
-      } else {
+      if (!date) {
         console.log(now, "no dates available")
+      } else if (date > currentBookedDate) {
+          console.log(now, `nearest date is further than already booked (${currentBookedDate})`, date)
+      } else {
+        currentBookedDate = date
+        const time = await checkAvailableTime(sessionHeaders, date)
+
+        book(sessionHeaders, date, time)
+          .then(d => console.log(now, "booked time at", date, time))
       }
 
       await sleep(30)
@@ -41,7 +39,7 @@ async function main(nearestDate = null) {
     console.error(err)
     console.info("Trying again")
 
-    main(nearestDate)
+    main(currentBookedDate)
   }
 }
 
