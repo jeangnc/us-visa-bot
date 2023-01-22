@@ -10,7 +10,12 @@ const FACILITY_ID = process.env.FACILITY_ID
 
 const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
 
-async function main(currentBookedDate = null) {
+async function main(currentBookedDate) {
+  if (!currentBookedDate) {
+    console.error(`Invalid current booked date ${currentBookedDate}`)
+    process.exit(1)
+  }
+
   console.log(`Initializing with current date ${currentBookedDate}`)
 
   try {
@@ -158,10 +163,4 @@ function sleep(s) {
 
 const args = process.argv.slice(2);
 const currentBookedDate = args[0]
-
-if (currentBookedDate) {
-  main(currentBookedDate)
-} else {
-  console.error('Missing current booked date. Usage: ./index.js <current booked date>')
-  process.exit(1)
-}
+main(currentBookedDate)
