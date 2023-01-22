@@ -26,11 +26,9 @@ async function main(nearestDate = null) {
           const time = await checkAvailableTime(sessionHeaders, date)
 
           book(sessionHeaders, date, time)
-            .then(d => console.log(d))
-
-          console.log(now, "booked time at", date, time)
+            .then(d => console.log(now, "booked time at", date, time))
         } else {
-          console.log(now, "nearest date is further than already booked", date)
+          console.log(now, `nearest date is further than already booked (${nearestDate})`, date)
         }
       } else {
         console.log(now, "no dates available")
