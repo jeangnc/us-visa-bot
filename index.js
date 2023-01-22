@@ -115,24 +115,24 @@ async function book(headers, date, time) {
 
 async function main(nearestDate = null) {
   try {
-    const headers = await fetch(`${BASE_URI}/users/sign_in`)
+    const sessionHeaders = await fetch(`${BASE_URI}/users/sign_in`)
       .then(response => extractHeaders(response))
-      .then(async (defaultHeaders) => (
-        Object.assign({}, defaultHeaders, {
-          'Cookie': await login(defaultHeaders).then(res => extractRelevantCookies(res))
+      .then(async anonymousHeaders => (
+        Object.assign({}, anonymousHeaders, {
+          'Cookie': await login(anonymousHeaders).then(res => extractRelevantCookies(res))
         })
       ))
 
     while(true) {
-      const date = await checkAvailableDate(headers)
+      const date = await checkAvailableDate(sessionHeaders)
 
       if (date) {
         const parsedDate = Date.parse(date)
 
         if (!nearestDate || parsedDate < nearestDate) {
           nearestDate = parsedDate
-          await checkAvailableTime(headers, date)
-            .then(time => book(headers, date, time))
+          await checkAvailableTime(sessionHeaders, date)
+            .then(time => book(sessionHeaders, date, time))
             .then(d => console.log(d))
 
           console.log(new Date().toString(), "booked time at", date, time)
@@ -148,8 +148,8 @@ async function main(nearestDate = null) {
 
   } catch(err) {
     console.error(err)
-    console.info("Trying again in 1 minute")
-    await sleep(60)
+    console.info("Trying again")
+
     main(nearestDate)
   }
 }
