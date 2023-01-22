@@ -6,6 +6,7 @@ import cheerio from 'cheerio';
 const USERNAME = process.env.USERNAME
 const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
+const FACILITY_ID = process.env.FACILITY_ID
 
 const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
 
@@ -63,8 +64,8 @@ function login(headers) {
   })
 }
 
-async function checkAvailableDate(headers) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/128.json?appointments[expedite]=false`, {
+function checkAvailableDate(headers) {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false`, {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
@@ -74,8 +75,8 @@ async function checkAvailableDate(headers) {
     .then(d => d.length > 0 ? d[0]['date'] : null)
 
 }
-async function checkAvailableTime(headers, date) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/128.json?date=${date}&appointments[expedite]=false`, {
+function checkAvailableTime(headers, date) {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`, {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
@@ -100,7 +101,7 @@ async function book(headers, date, time) {
       'authenticity_token': newHeaders['X-CSRF-Token'],
       'confirmed_limit_message': '1',
       'use_consulate_appointment_capacity': 'true',
-      'appointments[consulate_appointment][facility_id]': '128',
+      'appointments[consulate_appointment][facility_id]': FACILITY_ID,
       'appointments[consulate_appointment][date]': date,
       'appointments[consulate_appointment][time]': time,
       'appointments[asc_appointment][facility_id]': '',
