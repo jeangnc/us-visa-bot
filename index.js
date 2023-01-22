@@ -48,9 +48,14 @@ function extractRelevantCookies(res) {
   return `_yatri_session=${parsedCookies['_yatri_session']}`
 }
 
-function login(headers) {
+async function login() {
+  console.log(`Logging in`)
+
+  const anonymousHeaders = await fetch(`${BASE_URI}/users/sign_in`)
+    .then(response => extractHeaders(response))
+
   return fetch(`${BASE_URI}/users/sign_in`, {
-    "headers": Object.assign({}, headers, {
+    "headers": Object.assign({}, anonymousHeaders, {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
     }),
     "method": "POST",
@@ -62,6 +67,11 @@ function login(headers) {
       'commit': 'Acessar'
     }),
   })
+    .then(res => (
+      Object.assign({}, anonymousHeaders, {
+        'Cookie': extractRelevantCookies(res)
+      })
+    ))
 }
 
 function checkAvailableDate(headers) {
@@ -115,22 +125,14 @@ async function book(headers, date, time) {
 
 async function main(nearestDate = null) {
   try {
-    const sessionHeaders = await fetch(`${BASE_URI}/users/sign_in`)
-      .then(response => extractHeaders(response))
-      .then(async anonymousHeaders => (
-        Object.assign({}, anonymousHeaders, {
-          'Cookie': await login(anonymousHeaders).then(res => extractRelevantCookies(res))
-        })
-      ))
+    const sessionHeaders = await login()
 
     while(true) {
       const date = await checkAvailableDate(sessionHeaders)
 
       if (date) {
-        const parsedDate = Date.parse(date)
-
-        if (!nearestDate || parsedDate < nearestDate) {
-          nearestDate = parsedDate
+        if (!nearestDate || date < nearestDate) {
+          nearestDate = date
           const time = await checkAvailableTime(sessionHeaders, date)
 
           book(sessionHeaders, date, time)
