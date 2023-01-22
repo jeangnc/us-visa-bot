@@ -124,10 +124,13 @@ async function book(headers, date, time) {
 }
 
 async function main(nearestDate = null) {
+  console.log(`Initializing with current nearest date ${nearestDate}`)
+
   try {
     const sessionHeaders = await login()
 
     while(true) {
+      const now = new Date().toString()
       const date = await checkAvailableDate(sessionHeaders)
 
       if (date) {
@@ -138,12 +141,12 @@ async function main(nearestDate = null) {
           book(sessionHeaders, date, time)
             .then(d => console.log(d))
 
-          console.log(new Date().toString(), "booked time at", date, time)
+          console.log(now, "booked time at", date, time)
         } else {
-          console.log(new Date().toString(), "nearest date is further than already booked", date)
+          console.log(now, "nearest date is further than already booked", date)
         }
       } else {
-        console.log(new Date().toString(), "no dates available")
+        console.log(now, "no dates available")
       }
 
       await sleep(30)
@@ -157,4 +160,5 @@ async function main(nearestDate = null) {
   }
 }
 
-main()
+const args = process.argv.slice(2);
+main(args[0])
