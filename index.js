@@ -10,42 +10,41 @@ const FACILITY_ID = process.env.FACILITY_ID
 
 const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
 
-function sleep(s) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, s * 1000);
-  });
-}
+async function main(nearestDate = null) {
+  console.log(`Initializing with current nearest date ${nearestDate}`)
 
-async function extractHeaders(res) {
-  const cookies = extractRelevantCookies(res)
+  try {
+    const sessionHeaders = await login()
 
-  const html = await res.text()
-  const $ = cheerio.load(html);
-  const csrfToken = $('meta[name="csrf-token"]').attr('content')
+    while(true) {
+      const now = new Date().toString()
+      const date = await checkAvailableDate(sessionHeaders)
 
-  return {
-    "Cookie": cookies,
-    "X-CSRF-Token": csrfToken,
-    "Referer": BASE_URI,
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+      if (date) {
+        if (date < nearestDate) {
+          nearestDate = date
+          const time = await checkAvailableTime(sessionHeaders, date)
+
+          book(sessionHeaders, date, time)
+            .then(d => console.log(d))
+
+          console.log(now, "booked time at", date, time)
+        } else {
+          console.log(now, "nearest date is further than already booked", date)
+        }
+      } else {
+        console.log(now, "no dates available")
+      }
+
+      await sleep(30)
+    }
+
+  } catch(err) {
+    console.error(err)
+    console.info("Trying again")
+
+    main(nearestDate)
   }
-}
-
-function extractRelevantCookies(res) {
-  const parsedCookies = parseCookies(res.headers.get('set-cookie'))
-  return `_yatri_session=${parsedCookies['_yatri_session']}`
-}
-
-function parseCookies(cookies) {
-  const parsedCookies = {}
-
-  cookies.split(';').map(c => c.trim()).forEach(c => {
-    const [name, value] = c.split('=', 2)
-    parsedCookies[name] = value
-  })
-
-  return parsedCookies
 }
 
 async function login() {
@@ -123,41 +122,42 @@ async function book(headers, date, time) {
   })
 }
 
-async function main(nearestDate = null) {
-  console.log(`Initializing with current nearest date ${nearestDate}`)
+async function extractHeaders(res) {
+  const cookies = extractRelevantCookies(res)
 
-  try {
-    const sessionHeaders = await login()
+  const html = await res.text()
+  const $ = cheerio.load(html);
+  const csrfToken = $('meta[name="csrf-token"]').attr('content')
 
-    while(true) {
-      const now = new Date().toString()
-      const date = await checkAvailableDate(sessionHeaders)
-
-      if (date) {
-        if (date < nearestDate) {
-          nearestDate = date
-          const time = await checkAvailableTime(sessionHeaders, date)
-
-          book(sessionHeaders, date, time)
-            .then(d => console.log(d))
-
-          console.log(now, "booked time at", date, time)
-        } else {
-          console.log(now, "nearest date is further than already booked", date)
-        }
-      } else {
-        console.log(now, "no dates available")
-      }
-
-      await sleep(30)
-    }
-
-  } catch(err) {
-    console.error(err)
-    console.info("Trying again")
-
-    main(nearestDate)
+  return {
+    "Cookie": cookies,
+    "X-CSRF-Token": csrfToken,
+    "Referer": BASE_URI,
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
   }
+}
+
+function extractRelevantCookies(res) {
+  const parsedCookies = parseCookies(res.headers.get('set-cookie'))
+  return `_yatri_session=${parsedCookies['_yatri_session']}`
+}
+
+function parseCookies(cookies) {
+  const parsedCookies = {}
+
+  cookies.split(';').map(c => c.trim()).forEach(c => {
+    const [name, value] = c.split('=', 2)
+    parsedCookies[name] = value
+  })
+
+  return parsedCookies
+}
+
+function sleep(s) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, s * 1000);
+  });
 }
 
 const args = process.argv.slice(2);
