@@ -75,7 +75,7 @@ async function login() {
 }
 
 function checkAvailableDate(headers) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false`, {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false&t=${Date.now()}`, {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
@@ -87,7 +87,7 @@ function checkAvailableDate(headers) {
 
 }
 function checkAvailableTime(headers, date) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`, {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false&t=${Date.now()}`, {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
