@@ -79,7 +79,8 @@ function checkAvailableDate(headers) {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
-    })
+    }),
+    "cache": "no-store"
   })
     .then(r => r.json())
     .then(d => d.length > 0 ? d[0]['date'] : null)
@@ -90,7 +91,8 @@ function checkAvailableTime(headers, date) {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
-    })
+    }),
+    "cache": "no-store",
   })
     .then(r => r.json())
     .then(d => d['business_times'][0] || d['available_times'][0])
@@ -136,7 +138,7 @@ async function extractHeaders(res) {
     "Referer": BASE_URI,
     "Referrer-Policy": "strict-origin-when-cross-origin",
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-    'Cache-Control': 'no-cache',
+    'Cache-Control': 'no-store',
     'Connection': 'keep-alive'
   }
 }
