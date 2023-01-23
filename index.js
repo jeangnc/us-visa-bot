@@ -12,29 +12,28 @@ const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
 
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
-    console.error(`Invalid current booked date: ${currentBookedDate}`)
+    log(`Invalid current booked date: ${currentBookedDate}`)
     process.exit(1)
   }
 
-  console.log(`Initializing with current date ${currentBookedDate}`)
+  log(`Initializing with current date ${currentBookedDate}`)
 
   try {
     const sessionHeaders = await login()
 
     while(true) {
-      const now = new Date().toString()
       const date = await checkAvailableDate(sessionHeaders)
 
       if (!date) {
-        console.log(now, "no dates available")
+        log("no dates available")
       } else if (date > currentBookedDate) {
-          console.log(now, `nearest date is further than already booked (${currentBookedDate})`, date)
+          log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
       } else {
         currentBookedDate = date
         const time = await checkAvailableTime(sessionHeaders, date)
 
         book(sessionHeaders, date, time)
-          .then(d => console.log(now, "booked time at", date, time))
+          .then(d => log("booked time at ${date} ${time}"))
       }
 
       await sleep(30)
@@ -42,14 +41,14 @@ async function main(currentBookedDate) {
 
   } catch(err) {
     console.error(err)
-    console.info("Trying again")
+    log("Trying again")
 
     main(currentBookedDate)
   }
 }
 
 async function login() {
-  console.log(`Logging in`)
+  log(`Logging in`)
 
   const anonymousHeaders = await fetch(`${BASE_URI}/users/sign_in`)
     .then(response => extractHeaders(response))
@@ -176,6 +175,10 @@ function sleep(s) {
   return new Promise((resolve) => {
     setTimeout(resolve, s * 1000);
   });
+}
+
+function log(message) {
+  console.log(`[${new Date().toISOString()}]`, message)
 }
 
 const args = process.argv.slice(2);
