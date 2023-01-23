@@ -75,7 +75,7 @@ async function login() {
 }
 
 function checkAvailableDate(headers) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false&t=${Date.now()}`, {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false`, {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
@@ -83,11 +83,13 @@ function checkAvailableDate(headers) {
     "cache": "no-store"
   })
     .then(r => r.json())
+    .then(r => handleErrors(r))
     .then(d => d.length > 0 ? d[0]['date'] : null)
 
 }
+
 function checkAvailableTime(headers, date) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false&t=${Date.now()}`, {
+  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`, {
     "headers": Object.assign({}, headers, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
@@ -95,7 +97,18 @@ function checkAvailableTime(headers, date) {
     "cache": "no-store",
   })
     .then(r => r.json())
+    .then(r => handleErrors(r))
     .then(d => d['business_times'][0] || d['available_times'][0])
+}
+
+function handleErrors(response) {
+  const errorMessage = response['error']
+
+  if (errorMessage) {
+    throw new Error(errorMessage);
+  }
+
+  return response
 }
 
 async function book(headers, date, time) {
