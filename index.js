@@ -33,7 +33,7 @@ async function main(currentBookedDate) {
         const time = await checkAvailableTime(sessionHeaders, date)
 
         book(sessionHeaders, date, time)
-          .then(d => log("booked time at ${date} ${time}"))
+          .then(d => log(`booked time at ${date} ${time}`))
       }
 
       await sleep(30)
