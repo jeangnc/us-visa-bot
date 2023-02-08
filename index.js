@@ -36,7 +36,7 @@ async function main(currentBookedDate) {
           .then(d => log(`booked time at ${date} ${time}`))
       }
 
-      await sleep(30)
+      await sleep(3)
     }
 
   } catch(err) {
