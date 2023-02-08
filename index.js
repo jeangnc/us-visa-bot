@@ -27,7 +27,7 @@ async function main(currentBookedDate) {
       if (!date) {
         log("no dates available")
       } else if (date > currentBookedDate) {
-          log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
+        log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
       } else {
         currentBookedDate = date
         const time = await checkAvailableTime(sessionHeaders, date)
