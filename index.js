@@ -3,7 +3,7 @@
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
 
-const USERNAME = process.env.USERNAME
+const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
 const FACILITY_ID = process.env.FACILITY_ID
