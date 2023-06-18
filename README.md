@@ -9,8 +9,9 @@ he checks the nearest dates every few seconds, and when it finds a closer date, 
 ## How to find the variables?
 
 - EMAIL and PASSWORD are your credentials to https://ais.usvisa-info.com.
-- SCHEDULE_ID can be found in the URL when trying to reschedule manually https://ais.usvisa-info.com/fr-fr/niv/schedule/SCHEDULE_ID/continue_actions.
-- FACILITY_ID can be found looking at the network calls when trying to reschedule manually, when you get on the page where you can select a new date, you should see a network call similar to https://ais.usvisa-info.com/fr-fr/niv/schedule/XXXX/appointment/address/YY. Facility id is your YY. Paris is 44. Alternatively you can inspect the Selector on this page and look at the value.
+- LOCALE depends on your language, can be found in the URL when trying to reschedule https://ais.usvisa-info.com/{LOCALE}/. 'fr-fr' for France, 'pt-br' for Brazil...
+- SCHEDULE_ID can be found in the URL when trying to reschedule manually https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/continue_actions.
+- FACILITY_ID can be found looking at the network calls when trying to reschedule manually, when you get on the page where you can select a new date, you should see a network call similar to https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/appointment/address/{FACILITY_ID}. Paris is 44. Alternatively you can inspect the Selector on this page and look at the value.
 
 
 ## Installing
@@ -26,6 +27,7 @@ npm install
 ```sh
 export EMAIL=''
 export PASSWORD=''
+export LOCALE=''
 export SCHEDULE_ID=
 export FACILITY_ID=
 

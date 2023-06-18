@@ -7,8 +7,9 @@ const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
 const FACILITY_ID = process.env.FACILITY_ID
+const LOCALE = process.env.LOCALE
 
-const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
+const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
@@ -60,7 +61,7 @@ async function login() {
     "method": "POST",
     "body": new URLSearchParams({
       'utf8': '✓',
-      'user[email]': USERNAME,
+      'user[email]': EMAIL,
       'user[password]': PASSWORD,
       'policy_confirmed': '1',
       'commit': 'Acessar'
