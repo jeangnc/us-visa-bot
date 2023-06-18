@@ -8,6 +8,7 @@ const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
 const FACILITY_ID = process.env.FACILITY_ID
 const LOCALE = process.env.LOCALE
+const REFRESH_RATE = process.env.REFRESH_RATE || 3
 
 const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 
@@ -37,7 +38,7 @@ async function main(currentBookedDate) {
           .then(d => log(`booked time at ${date} ${time}`))
       }
 
-      await sleep(3)
+      await sleep(REFRESH_RATE)
     }
 
   } catch(err) {
