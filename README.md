@@ -4,7 +4,7 @@ Bot to anticipate the interview date for a US visa.
 ## How it works
 
 The bot is quite simple. You provide some informations for the bot to sign in in your behalf on https://ais.usvisa-info.com/, and then
-he checks the nearest dates every few seconds, and when it finds a closer date, it automatically book that time for you.
+it checks the nearest dates every few seconda. When it finds a closer date, it automatically book that time for you.
 
 ## Installing
 
