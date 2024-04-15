@@ -50,7 +50,14 @@ async function main(currentBookedDate) {
 async function login() {
   log(`Logging in`)
 
-  const anonymousHeaders = await fetch(`${BASE_URI}/users/sign_in`)
+  const anonymousHeaders = await fetch(`${BASE_URI}/users/sign_in`, {
+    headers: {
+      "User-Agent": "",
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Connection": "keep-alive",
+    },
+  })
     .then(response => extractHeaders(response))
 
   return fetch(`${BASE_URI}/users/sign_in`, {
