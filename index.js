@@ -3,12 +3,14 @@
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
 
-const USERNAME = process.env.USERNAME
+const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
 const FACILITY_ID = process.env.FACILITY_ID
+const LOCALE = process.env.LOCALE
+const REFRESH_DELAY = process.env.REFRESH_DELAY || 3
 
-const BASE_URI = 'https://ais.usvisa-info.com/pt-br/niv'
+const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
@@ -36,7 +38,7 @@ async function main(currentBookedDate) {
           .then(d => log(`booked time at ${date} ${time}`))
       }
 
-      await sleep(3)
+      await sleep(REFRESH_DELAY)
     }
 
   } catch(err) {
@@ -67,7 +69,7 @@ async function login() {
     "method": "POST",
     "body": new URLSearchParams({
       'utf8': '✓',
-      'user[email]': USERNAME,
+      'user[email]': EMAIL,
       'user[password]': PASSWORD,
       'policy_confirmed': '1',
       'commit': 'Acessar'
