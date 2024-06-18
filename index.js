@@ -170,10 +170,6 @@ async function extractData(res) {
   }
 }
 
-function parseSelectOptions($, selector) {
-  return $(selector).find('option').get().map(el => $(el).val().trim()).filter(v => v)
-}
-
 function extractRelevantCookies(res) {
   const parsedCookies = parseCookies(res.headers.get('set-cookie'))
   return `_yatri_session=${parsedCookies['_yatri_session']}`
@@ -188,6 +184,10 @@ function parseCookies(cookies) {
   })
 
   return parsedCookies
+}
+
+function parseSelectOptions($, selector) {
+  return $(selector).find('option').get().map(el => $(el).val().trim()).filter(v => v)
 }
 
 function sleep(s) {
