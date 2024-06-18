@@ -147,21 +147,36 @@ async function book(headers, date, time) {
 }
 
 async function extractHeaders(res) {
+  return extractData(res).then(d => d.headers)
+}
+
+async function extractData(res) {
   const cookies = extractRelevantCookies(res)
 
   const html = await res.text()
   const $ = cheerio.load(html);
   const csrfToken = $('meta[name="csrf-token"]').attr('content')
 
+  const facilities = parseSelectOptions($, '#appointments_consulate_appointment_facility_id')
+  const ascFacilities = parseSelectOptions($, '#appointments_asc_appointment_facility_id')
+
   return {
-    "Cookie": cookies,
-    "X-CSRF-Token": csrfToken,
-    "Referer": BASE_URI,
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-    'Cache-Control': 'no-store',
-    'Connection': 'keep-alive'
+    "headers": {
+      "Cookie": cookies,
+      "X-CSRF-Token": csrfToken,
+      "Referer": BASE_URI,
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+      'Cache-Control': 'no-store',
+      'Connection': 'keep-alive'
+    },
+    "facilities" : facilities,
+    "ascFacilities": ascFacilities
   }
+}
+
+function parseSelectOptions($, selector) {
+  return $(selector).find('option').get().map(el => $(el).val().trim()).filter(v => v)
 }
 
 function extractRelevantCookies(res) {
