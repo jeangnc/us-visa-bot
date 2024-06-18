@@ -63,7 +63,8 @@ async function login() {
       "Connection": "keep-alive",
     },
   })
-    .then(response => extractHeaders(response))
+    .then(response => extractData(response))
+    .then(data => data.headers)
 
   return fetch(`${BASE_URI}/users/sign_in`, {
     "headers": Object.assign({}, anonymousHeaders, {
@@ -119,7 +120,8 @@ function handleErrors(response) {
 
 async function book(date, time) {
   const newHeaders = await fetch(APPOINTMENT_URI, { "headers": sessionHeaders })
-    .then(response => extractHeaders(response))
+    .then(response => extractData(response))
+    .then(data => data.headers)
 
   return fetch(APPOINTMENT_URI, {
     "method": "POST",
@@ -140,10 +142,6 @@ async function book(date, time) {
       'appointments[asc_appointment][time]': ''
     }),
   })
-}
-
-async function extractHeaders(res) {
-  return extractData(res).then(d => d.headers)
 }
 
 async function extractData(res) {
