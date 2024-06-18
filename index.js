@@ -88,12 +88,25 @@ async function login() {
 }
 
 function checkAvailableDate() {
-  return jsonRequest(`${APPOINTMENT_URI}/days/${FACILITY_ID}.json?appointments[expedite]=false`)
+  const queryString = qs.stringify({
+    appointments: {
+      expedite: false
+    }
+  })
+
+  return jsonRequest(`${APPOINTMENT_URI}/days/${FACILITY_ID}.json?` + queryString)
     .then(d => d.length > 0 ? d[0]['date'] : null)
 }
 
 function checkAvailableTime(date) {
-  return jsonRequest(`${APPOINTMENT_URI}/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`)
+  const queryString = qs.stringify({
+    date: date,
+    appointments: {
+      expedite: false
+    }
+  })
+
+  return jsonRequest(`${APPOINTMENT_URI}/times/${FACILITY_ID}.json?` + queryString)
     .then(d => d['business_times'][0] || d['available_times'][0])
 }
 
