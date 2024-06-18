@@ -11,6 +11,8 @@ const LOCALE = process.env.LOCALE
 const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 3)
 
 const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
+const APPOINTMENT_URI = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
+
 let sessionHeaders = null
 
 async function main(currentBookedDate) {
@@ -84,12 +86,12 @@ async function login() {
 }
 
 function checkAvailableDate() {
-  return jsonRequest(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false`)
+  return jsonRequest(`${APPOINTMENT_URI}/days/${FACILITY_ID}.json?appointments[expedite]=false`)
     .then(d => d.length > 0 ? d[0]['date'] : null)
 }
 
 function checkAvailableTime(date) {
-  return jsonRequest(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`)
+  return jsonRequest(`${APPOINTMENT_URI}/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`)
     .then(d => d['business_times'][0] || d['available_times'][0])
 }
 
@@ -116,12 +118,10 @@ function handleErrors(response) {
 }
 
 async function book(date, time) {
-  const url = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
-
-  const newHeaders = await fetch(url, { "headers": sessionHeaders })
+  const newHeaders = await fetch(APPOINTMENT_URI, { "headers": sessionHeaders })
     .then(response => extractHeaders(response))
 
-  return fetch(url, {
+  return fetch(APPOINTMENT_URI, {
     "method": "POST",
     "redirect": "follow",
     "headers": Object.assign({}, newHeaders, {
