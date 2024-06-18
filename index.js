@@ -156,7 +156,6 @@ async function extractData(res) {
   const html = await res.text()
   const $ = cheerio.load(html);
   const csrfToken = $('meta[name="csrf-token"]').attr('content')
-
   const facilities = parseSelectOptions($, '#appointments_consulate_appointment_facility_id')
   const ascFacilities = parseSelectOptions($, '#appointments_asc_appointment_facility_id')
 
