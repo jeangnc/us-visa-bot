@@ -2,6 +2,7 @@
 
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
+import qs from 'qs';
 
 const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
