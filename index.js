@@ -11,6 +11,7 @@ const LOCALE = process.env.LOCALE
 const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 3)
 
 const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
+let sessionHeaders = null
 
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
@@ -21,10 +22,10 @@ async function main(currentBookedDate) {
   log(`Initializing with current date ${currentBookedDate}`)
 
   try {
-    const sessionHeaders = await login()
+    sessionHeaders = await login()
 
     while(true) {
-      const date = await checkAvailableDate(sessionHeaders)
+      const date = await checkAvailableDate()
 
       if (!date) {
         log("no dates available")
@@ -32,9 +33,9 @@ async function main(currentBookedDate) {
         log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
       } else {
         currentBookedDate = date
-        const time = await checkAvailableTime(sessionHeaders, date)
+        const time = await checkAvailableTime(date)
 
-        book(sessionHeaders, date, time)
+        book(date, time)
           .then(d => log(`booked time at ${date} ${time}`))
       }
 
@@ -82,31 +83,26 @@ async function login() {
     ))
 }
 
-function checkAvailableDate(headers) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false`, {
-    "headers": Object.assign({}, headers, {
-      "Accept": "application/json",
-      "X-Requested-With": "XMLHttpRequest",
-    }),
-    "cache": "no-store"
-  })
-    .then(r => r.json())
-    .then(r => handleErrors(r))
+function checkAvailableDate() {
+  return jsonRequest(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/days/${FACILITY_ID}.json?appointments[expedite]=false`)
     .then(d => d.length > 0 ? d[0]['date'] : null)
-
 }
 
-function checkAvailableTime(headers, date) {
-  return fetch(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`, {
-    "headers": Object.assign({}, headers, {
+function checkAvailableTime(date) {
+  return jsonRequest(`${BASE_URI}/schedule/${SCHEDULE_ID}/appointment/times/${FACILITY_ID}.json?date=${date}&appointments[expedite]=false`)
+    .then(d => d['business_times'][0] || d['available_times'][0])
+}
+
+function jsonRequest(url) {
+  return fetch(url, {
+    "headers": Object.assign({}, sessionHeaders, {
       "Accept": "application/json",
       "X-Requested-With": "XMLHttpRequest",
     }),
     "cache": "no-store",
   })
-    .then(r => r.json())
-    .then(r => handleErrors(r))
-    .then(d => d['business_times'][0] || d['available_times'][0])
+    .then(response => response.json())
+    .then(response => handleErrors(response))
 }
 
 function handleErrors(response) {
@@ -119,10 +115,10 @@ function handleErrors(response) {
   return response
 }
 
-async function book(headers, date, time) {
+async function book(date, time) {
   const url = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
 
-  const newHeaders = await fetch(url, { "headers": headers })
+  const newHeaders = await fetch(url, { "headers": sessionHeaders })
     .then(response => extractHeaders(response))
 
   return fetch(url, {
