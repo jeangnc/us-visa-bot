@@ -17,41 +17,67 @@ const APPOINTMENT_URI = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
 let sessionHeaders = null
 let facilities = null
 
-async function main(currentBookedDate) {
-  if (!currentBookedDate) {
-    log(`Invalid current booked date: ${currentBookedDate}`)
+async function main(currentConsularDate, currentAscDate) {
+  if (!currentConsularDate) {
+    log(`Invalid current consular date: ${currentConsularDate}`)
     process.exit(1)
   }
 
-  log(`Initializing with current date ${currentBookedDate}`)
+  log(`Initializing with current consular date ${currentConsularDate} and asc date ${currentAscDate}`)
 
   try {
     sessionHeaders = await login()
     facilities = await extractFacilities()
 
     while(true) {
-      const date = await checkAvailableDate()
+      const { asc, consular } = facilities
+      const consularDate = await checkAvailableDate(consular[0])
 
-      if (!date) {
+      if (!consularDate) {
         log("no dates available")
-      } else if (date > currentBookedDate) {
-        log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
+      } else if (consularDate > currentConsularDate) {
+        log(`nearest date is further than already booked (${currentConsularDate} vs ${consularDate})`)
       } else {
-        currentBookedDate = date
-        const time = await checkAvailableTime(date)
+        const consularTime = await checkAvailableTime(consular[0], consularDate)
+        const ascParams = {
+          consulate_id: consular[0],
+          consulate_date: consularDate,
+          consulate_time: consularTime
+        }
 
-        book(date, time)
-          .then(d => log(`booked time at ${date} ${time}`))
+        const bestAscDate = await checkAvailableDate(asc[0], ascParams)
+        if (!bestAscDate) {
+          log("no asc dates available")
+          continue
+        }
+
+        const ascDate = bestAscDate < currentAscDate ? bestAscDate : currentAscDate
+        const ascTime = await checkAvailableTime(asc[0], ascDate, ascParams)
+
+        const params = {
+          consularFacilityId: consular[0],
+          consularDate,
+          consularTime,
+          ascFacilityId: asc[0],
+          ascDate,
+          ascTime
+        }
+
+        book(params).then(() => {
+          log(`Booked appointment at ${consularDate} ${consularTime} and ${ascDate} ${ascTime}`)
+        })
+
+        currentConsularDate = consularDate
+        currentAscDate = ascDate
       }
 
       await sleep(REFRESH_DELAY)
     }
-
   } catch(err) {
     console.error(err)
     log("Trying again")
 
-    main(currentBookedDate)
+    main(currentConsularDate, currentAscDate)
   }
 }
 
@@ -95,35 +121,35 @@ async function extractFacilities() {
 
   const html = await response.text()
   const $ = cheerio.load(html);
-  const consularFacilities = parseSelectOptions($, '#appointments_consulate_appointment_facility_id')
   const ascFacilities = parseSelectOptions($, '#appointments_asc_appointment_facility_id')
+  const consularFacilities = parseSelectOptions($, '#appointments_consulate_appointment_facility_id')
 
   return {
-    consular: consularFacilities,
     asc: ascFacilities,
+    consular: consularFacilities,
   }
 }
 
-function checkAvailableDate() {
-  const queryString = qs.stringify({
+function checkAvailableDate(facilityId, params = {}) {
+  const mergedParams = Object.assign({}, params, {
     appointments: {
       expedite: false
     }
   })
 
-  return jsonRequest(`${APPOINTMENT_URI}/days/${PREFERED_FACILITY_ID}.json?` + queryString)
+  return jsonRequest(`${APPOINTMENT_URI}/days/${facilityId}.json?` + qs.stringify(mergedParams))
     .then(d => d.length > 0 ? d[0]['date'] : null)
 }
 
-function checkAvailableTime(date) {
-  const queryString = qs.stringify({
+function checkAvailableTime(facilityId, date, params = {}) {
+  const mergedParams = Object.assign({}, params, {
     date: date,
     appointments: {
       expedite: false
     }
   })
 
-  return jsonRequest(`${APPOINTMENT_URI}/times/${PREFERED_FACILITY_ID}.json?` + queryString)
+  return jsonRequest(`${APPOINTMENT_URI}/times/${facilityId}.json?` + qs.stringify(mergedParams))
     .then(d => d['business_times'][0] || d['available_times'][0])
 }
 
@@ -149,7 +175,7 @@ function handleErrors(response) {
   return response
 }
 
-async function book(date, time) {
+async function book({ consularFacilityId, consularDate, consularTime, ascFacilityId, ascDate, ascTime }) {
   const newHeaders = await loadAppointmentPage()
     .then(response => extractHeaders(response))
 
@@ -164,12 +190,12 @@ async function book(date, time) {
       'authenticity_token': newHeaders['X-CSRF-Token'],
       'confirmed_limit_message': '1',
       'use_consulate_appointment_capacity': 'true',
-      'appointments[consulate_appointment][facility_id]': PREFERED_FACILITY_ID,
-      'appointments[consulate_appointment][date]': date,
-      'appointments[consulate_appointment][time]': time,
-      'appointments[asc_appointment][facility_id]': '',
-      'appointments[asc_appointment][date]': '',
-      'appointments[asc_appointment][time]': ''
+      'appointments[consulate_appointment][facility_id]': consularFacilityId,
+      'appointments[consulate_appointment][date]': consularDate,
+      'appointments[consulate_appointment][time]': consularTime,
+      'appointments[asc_appointment][facility_id]': ascFacilityId,
+      'appointments[asc_appointment][date]': ascDate,
+      'appointments[asc_appointment][time]': ascTime,
     }),
   })
 }
@@ -227,5 +253,6 @@ function log(message) {
 }
 
 const args = process.argv.slice(2);
-const currentBookedDate = args[0]
-main(currentBookedDate)
+const currentConsularDate = args[0]
+const currentAscDate = args[1]
+main(currentConsularDate, currentAscDate)
