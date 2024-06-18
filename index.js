@@ -30,43 +30,43 @@ async function main(currentConsularDate, currentAscDate) {
     facilities = await retry(extractFacilities)
 
     while(true) {
-      const { asc, consular } = facilities
-      const consularDate = await checkAvailableDate(consular[0])
+      const { ascFacility, consularFacility } = facilities
+      const consularDate = await checkAvailableDate(consularFacility[0])
 
       if (!consularDate) {
         log("No dates available")
       } else if (consularDate >= currentConsularDate) {
         log(`Nearest date is worse or equal what's already booked (${consularDate} vs ${currentConsularDate})`)
       } else {
-        const consularTime = await checkAvailableTime(consular[0], consularDate)
+        const consularTime = await checkAvailableTime(consularFacility[0], consularDate)
 
+        let ascDate = ''
+        let ascTime = ''
         let params = {
-          consularFacilityId: consular[0],
+          consularFacilityId: consularFacility[0],
           consularDate,
           consularTime,
-          ascFacilityId: '',
-          ascDate: '',
-          ascTime: ''
+          ascFacilityId: ascFacility[0],
+          ascDate,
+          ascTime,
         }
 
         if (currentAscDate) {
           const ascParams = {
-            consulate_id: consular[0],
+            consulate_id: consularFacility[0],
             consulate_date: consularDate,
             consulate_time: consularTime
           }
 
-          const bestAscDate = await checkAvailableDate(asc[0], ascParams)
+          const bestAscDate = await checkAvailableDate(ascFacility[0], ascParams)
           if (!bestAscDate) {
             log("No asc dates available")
             continue
           }
 
-          const ascDate = bestAscDate < currentAscDate ? bestAscDate : currentAscDate
-          const ascTime = await checkAvailableTime(asc[0], ascDate, ascParams)
-
+          ascDate = bestAscDate < currentAscDate ? bestAscDate : currentAscDate
+          ascTime = await checkAvailableTime(ascFacility[0], ascDate, ascParams)
           params = Object.assign({}, params, {
-            ascFacilityId: asc[0],
             ascDate,
             ascTime
           })
@@ -77,9 +77,7 @@ async function main(currentConsularDate, currentAscDate) {
         })
 
         currentConsularDate = consularDate
-        if (currentAscDate) {
-          currentAscDate = ascDate
-        }
+        currentAscDate = ascDate
       }
 
       await sleep(REFRESH_DELAY)
