@@ -39,32 +39,41 @@ async function main(currentConsularDate, currentAscDate) {
         log(`Nearest date is worse or equal what's already booked (${consularDate} vs ${currentConsularDate})`)
       } else {
         const consularTime = await checkAvailableTime(consular[0], consularDate)
-        const ascParams = {
-          consulate_id: consular[0],
-          consulate_date: consularDate,
-          consulate_time: consularTime
-        }
 
-        const bestAscDate = await checkAvailableDate(asc[0], ascParams)
-        if (!bestAscDate) {
-          log("No asc dates available")
-          continue
-        }
-
-        const ascDate = bestAscDate < currentAscDate ? bestAscDate : currentAscDate
-        const ascTime = await checkAvailableTime(asc[0], ascDate, ascParams)
-
-        const params = {
+        let params = {
           consularFacilityId: consular[0],
           consularDate,
           consularTime,
-          ascFacilityId: asc[0],
-          ascDate,
-          ascTime
+          ascFacilityId: '',
+          ascDate: '',
+          ascTime: ''
+        }
+
+        if (currentAscDate) {
+          const ascParams = {
+            consulate_id: consular[0],
+            consulate_date: consularDate,
+            consulate_time: consularTime
+          }
+
+          const bestAscDate = await checkAvailableDate(asc[0], ascParams)
+          if (!bestAscDate) {
+            log("No asc dates available")
+            continue
+          }
+
+          const ascDate = bestAscDate < currentAscDate ? bestAscDate : currentAscDate
+          const ascTime = await checkAvailableTime(asc[0], ascDate, ascParams)
+
+          params = Object.assign({}, params, {
+            ascFacilityId: asc[0],
+            ascDate,
+            ascTime
+          })
         }
 
         book(params).then(() => {
-          log(`Booked appointment at ${consularDate} ${consularTime} and ${ascDate} ${ascTime}`)
+          log(`Booked appointment with ${params}`)
         })
 
         currentConsularDate = consularDate
