@@ -22,17 +22,12 @@ You'll need node 16+ to run the bot. Also, you'll have to install some dependenc
 npm install
 ```
 
-## Warning
-
-The system is rate limited. It's unclear what the limit actually is. Some suggested 60 tries in 5 hours. If you start to see "no dates available", it means you're blocked. Leave it alone for a few hours and try again later.
-To avoid this, set the refresh delay to a high enough number, probably 300.
 ## Usage
 
 ```sh
 export EMAIL=''
 export PASSWORD=''
 export LOCALE=''
-export REFRESH_DELAY=300
 export SCHEDULE_ID=
 export FACILITY_ID=
 
