@@ -77,7 +77,9 @@ async function main(currentConsularDate, currentAscDate) {
         })
 
         currentConsularDate = consularDate
-        currentAscDate = ascDate
+        if (currentAscDate) {
+          currentAscDate = ascDate
+        }
       }
 
       await sleep(REFRESH_DELAY)
