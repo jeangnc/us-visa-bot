@@ -34,9 +34,9 @@ async function main(currentConsularDate, currentAscDate) {
       const consularDate = await checkAvailableDate(consular[0])
 
       if (!consularDate) {
-        log("no dates available")
-      } else if (consularDate > currentConsularDate) {
-        log(`nearest date is further than already booked (${currentConsularDate} vs ${consularDate})`)
+        log("No dates available")
+      } else if (consularDate >= currentConsularDate) {
+        log(`Nearest date is worse or equal than what's already booked (${consularDate} vs ${currentConsularDate})`)
       } else {
         const consularTime = await checkAvailableTime(consular[0], consularDate)
         const ascParams = {
@@ -47,7 +47,7 @@ async function main(currentConsularDate, currentAscDate) {
 
         const bestAscDate = await checkAvailableDate(asc[0], ascParams)
         if (!bestAscDate) {
-          log("no asc dates available")
+          log("No asc dates available")
           continue
         }
 
