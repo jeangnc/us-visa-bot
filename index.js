@@ -30,42 +30,42 @@ async function main(currentConsularDate, currentAscDate) {
     facilities = await retry(extractFacilities)
 
     while(true) {
-      const { ascFacility, consularFacility } = facilities
-      const consularDate = await checkAvailableDate(consularFacility[0])
+      const { asc: ascFacilities, consular: consularFacilities } = facilities
+      const consularDate = await checkAvailableDate(consularFacilities[0])
 
       if (!consularDate) {
         log("No dates available")
       } else if (consularDate >= currentConsularDate) {
         log(`Nearest date is worse or equal what's already booked (${consularDate} vs ${currentConsularDate})`)
       } else {
-        const consularTime = await checkAvailableTime(consularFacility[0], consularDate)
+        const consularTime = await checkAvailableTime(consularFacilities[0], consularDate)
 
         let ascDate = ''
         let ascTime = ''
         let params = {
-          consularFacilityId: consularFacility[0],
+          consularFacilityId: consularFacilities[0],
           consularDate,
           consularTime,
-          ascFacilityId: ascFacility[0],
+          ascFacilityId: ascFacilities[0],
           ascDate,
           ascTime,
         }
 
         if (currentAscDate) {
           const ascParams = {
-            consulate_id: consularFacility[0],
+            consulate_id: consularFacilities[0],
             consulate_date: consularDate,
             consulate_time: consularTime
           }
 
-          const bestAscDate = await checkAvailableDate(ascFacility[0], ascParams)
+          const bestAscDate = await checkAvailableDate(ascFacilities[0], ascParams)
           if (!bestAscDate) {
             log("No asc dates available")
             continue
           }
 
           ascDate = bestAscDate < currentAscDate ? bestAscDate : currentAscDate
-          ascTime = await checkAvailableTime(ascFacility[0], ascDate, ascParams)
+          ascTime = await checkAvailableTime(ascFacilities[0], ascDate, ascParams)
           params = Object.assign({}, params, {
             ascDate,
             ascTime
