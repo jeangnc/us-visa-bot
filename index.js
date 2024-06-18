@@ -260,13 +260,21 @@ function sleep(s) {
 }
 
 function retry(fn, retries = 3) {
-  return fn().catch(err => {
-    if (retries > 0) {
-      return retry(fn, retries - 1)
-    } else {
+  try {
+    return fn().catch(err => {
+      if (retries > 0) {
+        return retry(fn, retries - 1)
+      } else {
+        throw err
+      }
+    })
+  } catch(err) {
+    if (retries === 0) {
       throw err
     }
-  })
+
+    return retry(fn, retries - 1)
+  }
 }
 
 function log(message) {
