@@ -26,8 +26,8 @@ async function main(currentConsularDate, currentAscDate) {
   log(`Initializing with current consular date ${currentConsularDate} and asc date ${currentAscDate}`)
 
   try {
-    sessionHeaders = await login()
-    facilities = await extractFacilities()
+    sessionHeaders = await retry(login)
+    facilities = await retry(extractFacilities)
 
     while(true) {
       const { asc, consular } = facilities
@@ -246,6 +246,16 @@ function sleep(s) {
   return new Promise((resolve) => {
     setTimeout(resolve, s * 1000);
   });
+}
+
+function retry(fn, retries = 3) {
+  return fn().catch(err => {
+    if (retries > 0) {
+      return retry(fn, retries - 1)
+    } else {
+      throw err
+    }
+  })
 }
 
 function log(message) {
