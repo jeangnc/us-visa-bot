@@ -7,7 +7,7 @@ import qs from 'qs';
 const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
-const FACILITY_ID = process.env.FACILITY_ID
+const PREFERED_FACILITY_ID = process.env.FACILITY_ID
 const LOCALE = process.env.LOCALE
 const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 3)
 
@@ -94,7 +94,7 @@ function checkAvailableDate() {
     }
   })
 
-  return jsonRequest(`${APPOINTMENT_URI}/days/${FACILITY_ID}.json?` + queryString)
+  return jsonRequest(`${APPOINTMENT_URI}/days/${PREFERED_FACILITY_ID}.json?` + queryString)
     .then(d => d.length > 0 ? d[0]['date'] : null)
 }
 
@@ -106,7 +106,7 @@ function checkAvailableTime(date) {
     }
   })
 
-  return jsonRequest(`${APPOINTMENT_URI}/times/${FACILITY_ID}.json?` + queryString)
+  return jsonRequest(`${APPOINTMENT_URI}/times/${PREFERED_FACILITY_ID}.json?` + queryString)
     .then(d => d['business_times'][0] || d['available_times'][0])
 }
 
@@ -148,7 +148,7 @@ async function book(date, time) {
       'authenticity_token': newHeaders['X-CSRF-Token'],
       'confirmed_limit_message': '1',
       'use_consulate_appointment_capacity': 'true',
-      'appointments[consulate_appointment][facility_id]': FACILITY_ID,
+      'appointments[consulate_appointment][facility_id]': PREFERED_FACILITY_ID,
       'appointments[consulate_appointment][date]': date,
       'appointments[consulate_appointment][time]': time,
       'appointments[asc_appointment][facility_id]': '',
