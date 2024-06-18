@@ -15,6 +15,7 @@ const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 const APPOINTMENT_URI = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
 
 let sessionHeaders = null
+let facilities = null
 
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
@@ -26,6 +27,7 @@ async function main(currentBookedDate) {
 
   try {
     sessionHeaders = await login()
+    facilities = await extractFacilities()
 
     while(true) {
       const date = await checkAvailableDate()
@@ -64,8 +66,7 @@ async function login() {
       "Connection": "keep-alive",
     },
   })
-    .then(response => extractData(response))
-    .then(data => data.headers)
+    .then(response => extractHeaders(response))
 
   return fetch(`${BASE_URI}/users/sign_in`, {
     "headers": Object.assign({}, anonymousHeaders, {
@@ -85,6 +86,22 @@ async function login() {
         'Cookie': extractRelevantCookies(res)
       })
     ))
+}
+
+async function extractFacilities() {
+  log(`Loading facilities`)
+
+  const response = await loadAppointmentPage()
+
+  const html = await response.text()
+  const $ = cheerio.load(html);
+  const consularFacilities = parseSelectOptions($, '#appointments_consulate_appointment_facility_id')
+  const ascFacilities = parseSelectOptions($, '#appointments_asc_appointment_facility_id')
+
+  return {
+    consular: consularFacilities,
+    asc: ascFacilities,
+  }
 }
 
 function checkAvailableDate() {
@@ -133,9 +150,8 @@ function handleErrors(response) {
 }
 
 async function book(date, time) {
-  const newHeaders = await fetch(APPOINTMENT_URI, { "headers": sessionHeaders })
-    .then(response => extractData(response))
-    .then(data => data.headers)
+  const newHeaders = await loadAppointmentPage()
+    .then(response => extractHeaders(response))
 
   return fetch(APPOINTMENT_URI, {
     "method": "POST",
@@ -158,27 +174,25 @@ async function book(date, time) {
   })
 }
 
-async function extractData(res) {
-  const cookies = extractRelevantCookies(res)
+function loadAppointmentPage() {
+  return fetch(APPOINTMENT_URI, { "headers": sessionHeaders })
+}
 
-  const html = await res.text()
+async function extractHeaders(response) {
+  const cookies = extractRelevantCookies(response)
+
+  const html = await response.text()
   const $ = cheerio.load(html);
   const csrfToken = $('meta[name="csrf-token"]').attr('content')
-  const facilities = parseSelectOptions($, '#appointments_consulate_appointment_facility_id')
-  const ascFacilities = parseSelectOptions($, '#appointments_asc_appointment_facility_id')
 
   return {
-    "headers": {
-      "Cookie": cookies,
-      "X-CSRF-Token": csrfToken,
-      "Referer": BASE_URI,
-      "Referrer-Policy": "strict-origin-when-cross-origin",
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
-      'Cache-Control': 'no-store',
-      'Connection': 'keep-alive'
-    },
-    "facilities" : facilities,
-    "ascFacilities": ascFacilities
+    "Cookie": cookies,
+    "X-CSRF-Token": csrfToken,
+    "Referer": BASE_URI,
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+    'Cache-Control': 'no-store',
+    'Connection': 'keep-alive'
   }
 }
 
