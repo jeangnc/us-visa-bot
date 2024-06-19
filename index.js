@@ -102,7 +102,8 @@ async function login() {
       "Connection": "keep-alive",
     },
   })
-    .then(response => extractHeaders(response))
+    .then(handleErrors)
+    .then(extractHeaders)
 
   return fetch(`${BASE_URI}/users/sign_in`, {
     "headers": Object.assign({}, anonymousHeaders, {
@@ -172,11 +173,20 @@ function jsonRequest(url) {
     }),
     "cache": "no-store",
   })
-    .then(response => response.json())
     .then(handleErrors)
+    .then(response => response.json())
+    .then(handleErrorJson)
 }
 
 function handleErrors(response) {
+  if (!response.ok) {
+    throw new Error(`Got response status: ${response.status}`);
+  }
+
+  return response
+}
+
+function handleErrorJson(response) {
   const errorMessage = response['error']
 
   if (errorMessage) {
