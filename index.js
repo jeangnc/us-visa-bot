@@ -9,7 +9,7 @@ const PASSWORD = process.env.PASSWORD
 const SCHEDULE_ID = process.env.SCHEDULE_ID
 const PREFERED_FACILITY_ID = process.env.FACILITY_ID
 const LOCALE = process.env.LOCALE
-const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 3)
+const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 5)
 
 const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 const APPOINTMENT_URI = `${BASE_URI}/schedule/${SCHEDULE_ID}/appointment`
@@ -279,7 +279,7 @@ async function retry(fn, retries = 3) {
       throw err
     }
 
-    await sleep(1)
+    await sleep(3)
     return retry(fn, retries - 1)
   }
 }
