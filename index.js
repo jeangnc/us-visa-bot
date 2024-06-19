@@ -84,7 +84,8 @@ async function main(currentConsularDate, currentAscDate) {
     }
   } catch(err) {
     console.error(err)
-    log("Trying again")
+    log("Trying again in 5 seconds")
+    await sleep(5)
 
     main(currentConsularDate, currentAscDate)
   }
@@ -116,9 +117,10 @@ async function login() {
       'commit': 'Acessar'
     }),
   })
-    .then(res => (
+    .then(handleErrors)
+    .then(response => (
       Object.assign({}, anonymousHeaders, {
-        'Cookie': extractRelevantCookies(res)
+        'Cookie': extractRelevantCookies(response)
       })
     ))
 }
@@ -171,7 +173,7 @@ function jsonRequest(url) {
     "cache": "no-store",
   })
     .then(response => response.json())
-    .then(response => handleErrors(response))
+    .then(handleErrors)
 }
 
 function handleErrors(response) {
