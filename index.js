@@ -257,20 +257,17 @@ function sleep(s) {
   });
 }
 
-function retry(fn, retries = 3) {
+async function retry(fn, retries = 3) {
   try {
     return fn().catch(err => {
-      if (retries > 0) {
-        return retry(fn, retries - 1)
-      } else {
-        throw err
-      }
+      throw err
     })
   } catch(err) {
     if (retries === 0) {
       throw err
     }
 
+    await sleep(1)
     return retry(fn, retries - 1)
   }
 }
