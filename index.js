@@ -175,7 +175,7 @@ function jsonRequest(url) {
   })
     .then(handleErrors)
     .then(response => response.json())
-    .then(handleErrorJson)
+    .then(handleErrorBody)
 }
 
 function handleErrors(response) {
@@ -186,7 +186,7 @@ function handleErrors(response) {
   return response
 }
 
-function handleErrorJson(response) {
+function handleErrorBody(response) {
   const errorMessage = response['error']
 
   if (errorMessage) {
