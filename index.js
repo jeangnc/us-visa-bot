@@ -223,6 +223,7 @@ async function book({ consularFacilityId, consularDate, consularTime, ascFacilit
 
 function loadAppointmentPage() {
   return fetch(APPOINTMENT_URI, { "headers": sessionHeaders })
+    .then(handleErrors)
 }
 
 async function extractHeaders(response) {
