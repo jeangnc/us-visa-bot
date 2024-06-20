@@ -198,7 +198,7 @@ function handleErrorBody(response) {
 
 async function book({ consularFacilityId, consularDate, consularTime, ascFacilityId, ascDate, ascTime }) {
   const newHeaders = await loadAppointmentPage()
-    .then(response => extractHeaders(response))
+    .then(extractHeaders)
 
   return fetch(APPOINTMENT_URI, {
     "method": "POST",
