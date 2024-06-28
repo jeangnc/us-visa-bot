@@ -12,16 +12,17 @@ const SCHEDULE_ID = process.env.SCHEDULE_ID
 const FACILITY_ID = process.env.FACILITY_ID
 const LOCALE = process.env.LOCALE
 const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 3)
+const CURRENT_BOOKED_DATE = process.env.CURRENT_BOOKED_DATE
 
 const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 
-async function main(currentBookedDate) {
-  if (!currentBookedDate) {
-    log(`Invalid current booked date: ${currentBookedDate}`)
+async function main(CURRENT_BOOKED_DATE) {
+  if (!CURRENT_BOOKED_DATE) {
+    log(`Invalid current booked date: ${CURRENT_BOOKED_DATE}`)
     process.exit(1)
   }
 
-  log(`Initializing with current date ${currentBookedDate}`)
+  log(`Initializing with current date ${CURRENT_BOOKED_DATE}`)
 
   try {
     const sessionHeaders = await login()
@@ -31,10 +32,10 @@ async function main(currentBookedDate) {
 
       if (!date) {
         log("no dates available")
-      } else if (date > currentBookedDate) {
-        log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
+      } else if (date > CURRENT_BOOKED_DATE) {
+        log(`nearest date is further than already booked (${CURRENT_BOOKED_DATE} vs ${date})`)
       } else {
-        currentBookedDate = date
+        CURRENT_BOOKED_DATE = date
         const time = await checkAvailableTime(sessionHeaders, date)
 
         book(sessionHeaders, date, time)
@@ -48,7 +49,7 @@ async function main(currentBookedDate) {
     console.error(err)
     log("Trying again")
 
-    main(currentBookedDate)
+    main(CURRENT_BOOKED_DATE)
   }
 }
 
@@ -193,6 +194,4 @@ function log(message) {
   console.log(`[${new Date().toISOString()}]`, message)
 }
 
-const args = process.argv.slice(2);
-const currentBookedDate = args[0]
-main(currentBookedDate)
+main(CURRENT_BOOKED_DATE)
