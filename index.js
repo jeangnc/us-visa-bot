@@ -3,8 +3,9 @@
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
 
-const dotenv = require('dotenv');
+import dotenv from 'dotenv';
 dotenv.config();
+
 
 const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
