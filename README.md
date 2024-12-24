@@ -11,7 +11,9 @@ it checks the nearest dates every few seconds. When it finds a closer date, it a
 - EMAIL and PASSWORD are your credentials to https://ais.usvisa-info.com.
 - LOCALE depends on your language, can be found in the URL when trying to reschedule https://ais.usvisa-info.com/{LOCALE}/. 'fr-fr' for France, 'pt-br' for Brazil...
 - SCHEDULE_ID can be found in the URL when trying to reschedule manually https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/continue_actions.
-- FACILITY_ID can be found looking at the network calls when trying to reschedule manually, when you get on the page where you can select a new date, you should see a network call similar to https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/appointment/address/{FACILITY_ID}. Paris is 44. Alternatively you can inspect the Selector on this page and look at the value.
+- FACILITY_ID can be found looking at the network calls when trying to reschedule manually, when you get on the page where you can select a new date, you should see a network call similar to https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/appointment/address/{FACILITY_ID}. Ecuador 108 Guayaquil. Alternatively you can inspect the Selector on this page and look at the value.
+- TELEGRAM Using Telegram with constants TELEGRAM_TOKEN and TELEGRAM_CHAT_ID, you will receive notifications only for successfully booked appointment reservations.
+- WAITING TIME Algorithm to wait for every minute multiple, which is the exact time appointment slots are released.
 
 
 ## Installing
@@ -30,6 +32,8 @@ export PASSWORD=''
 export LOCALE=''
 export SCHEDULE_ID=
 export FACILITY_ID=
+export TELEGRAM_TOKEN=
+export TELEGRAM_CHAT_ID=
 
 ./index.js <your current interview date, ex: 2023-01-01>
 ```
