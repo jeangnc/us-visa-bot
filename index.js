@@ -2,6 +2,9 @@
 
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const EMAIL = process.env.EMAIL
 const PASSWORD = process.env.PASSWORD
@@ -23,7 +26,7 @@ async function main(currentBookedDate) {
   try {
     const sessionHeaders = await login()
 
-    while(true) {
+    while (true) {
       const date = await checkAvailableDate(sessionHeaders)
 
       if (!date) {
@@ -31,17 +34,21 @@ async function main(currentBookedDate) {
       } else if (date > currentBookedDate) {
         log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
       } else {
-        currentBookedDate = date
         const time = await checkAvailableTime(sessionHeaders, date)
 
-        book(sessionHeaders, date, time)
-          .then(d => log(`booked time at ${date} ${time}`))
+        if (!time) {
+          log(`no available time slots for date ${date}`)
+        } else {
+          book(sessionHeaders, date, time)
+            .then(d => log(`booked time at ${date} ${time}`))
+          currentBookedDate = date
+        }
       }
 
       await sleep(REFRESH_DELAY)
     }
 
-  } catch(err) {
+  } catch (err) {
     console.error(err)
     log("Trying again")
 
