@@ -3,9 +3,12 @@
   "version": "0.0.1",
   "description": "",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"No linter configured\"",
+    "dev": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
