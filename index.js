@@ -40,7 +40,7 @@ async function main(currentBookedDate, targetDate, minDate) {
 
       if (!date) {
         log("no dates available")
-      } else if (date > currentBookedDate) {
+      } else if (date >= currentBookedDate) {
         log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
       } else if (minDate && date < minDate) {
         log(`nearest date is before minimum date (${date} vs ${minDate})`)
