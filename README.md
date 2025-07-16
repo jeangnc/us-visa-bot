@@ -53,7 +53,7 @@ REFRESH_DELAY=3
 |----------|-------------|-------------|
 | `EMAIL` | Your login email | Your credentials for ais.usvisa-info.com |
 | `PASSWORD` | Your login password | Your credentials for ais.usvisa-info.com |
-| `LOCALE` | Your country/language code | Found in URL: `https://ais.usvisa-info.com/{LOCALE}/` <br>Examples: `fr-fr` (France), `pt-br` (Brazil) |
+| `LOCALE` | Your country/language code | Found in URL: `https://ais.usvisa-info.com/{LOCALE}/` <br>Examples: `en-br` (brazil in english), `pt-br` (Brazil in portuguese) |
 | `SCHEDULE_ID` | Your appointment schedule ID | Found in URL when rescheduling: <br>`https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/continue_actions` |
 | `FACILITY_ID` | Your consulate facility ID | Found in network calls when selecting dates, or inspect the date selector dropdown <br>Example: Paris = `44` |
 | `REFRESH_DELAY` | Seconds between checks | Optional, defaults to 3 seconds |
