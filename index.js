@@ -15,6 +15,12 @@ const REFRESH_DELAY = Number(process.env.REFRESH_DELAY || 3)
 
 const BASE_URI = `https://ais.usvisa-info.com/${LOCALE}/niv`
 
+if (!EMAIL || !PASSWORD || !SCHEDULE_ID || !FACILITY_ID || !LOCALE) {
+  console.error("Missing required environment variables: EMAIL, PASSWORD, SCHEDULE_ID, FACILITY_ID, LOCALE")
+  process.exit(1)
+}
+
+
 async function main(currentBookedDate) {
   if (!currentBookedDate) {
     log(`Invalid current booked date: ${currentBookedDate}`)
@@ -173,6 +179,7 @@ async function extractHeaders(res) {
 
 function extractRelevantCookies(res) {
   const parsedCookies = parseCookies(res.headers.get('set-cookie'))
+
   return `_yatri_session=${parsedCookies['_yatri_session']}`
 }
 
