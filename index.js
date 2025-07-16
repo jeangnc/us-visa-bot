@@ -3,6 +3,7 @@
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
 import dotenv from 'dotenv';
+import { program } from 'commander';
 
 dotenv.config();
 
@@ -21,13 +22,15 @@ if (!EMAIL || !PASSWORD || !SCHEDULE_ID || !FACILITY_ID || !LOCALE) {
 }
 
 
-async function main(currentBookedDate) {
-  if (!currentBookedDate) {
-    log(`Invalid current booked date: ${currentBookedDate}`)
-    process.exit(1)
-  }
+async function main(currentBookedDate, targetDate, minDate) {
 
   log(`Initializing with current date ${currentBookedDate}`)
+  if (targetDate) {
+    log(`Target date: ${targetDate}`)
+  }
+  if (minDate) {
+    log(`Minimum date: ${minDate}`)
+  }
 
   try {
     const sessionHeaders = await login()
@@ -39,6 +42,8 @@ async function main(currentBookedDate) {
         log("no dates available")
       } else if (date > currentBookedDate) {
         log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`)
+      } else if (minDate && date < minDate) {
+        log(`nearest date is before minimum date (${date} vs ${minDate})`)
       } else {
         const time = await checkAvailableTime(sessionHeaders, date)
 
@@ -48,6 +53,11 @@ async function main(currentBookedDate) {
           book(sessionHeaders, date, time)
             .then(d => log(`booked time at ${date} ${time}`))
           currentBookedDate = date
+          
+          if (targetDate && date <= targetDate) {
+            log(`Target date reached! Successfully booked appointment on ${date}`)
+            process.exit(0)
+          }
         }
       }
 
@@ -58,7 +68,7 @@ async function main(currentBookedDate) {
     console.error(err)
     log("Trying again")
 
-    main(currentBookedDate)
+    main(currentBookedDate, targetDate, minDate)
   }
 }
 
@@ -204,6 +214,11 @@ function log(message) {
   console.log(`[${new Date().toISOString()}]`, message)
 }
 
-const args = process.argv.slice(2);
-const currentBookedDate = args[0]
-main(currentBookedDate)
+program
+  .requiredOption('-c, --current <date>', 'current booked date')
+  .option('-t, --target <date>', 'target date to stop at')
+  .option('-m, --min <date>', 'minimum date acceptable')
+  .parse();
+
+const options = program.opts();
+main(options.current, options.target, options.min)
