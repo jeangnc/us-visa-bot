@@ -122,8 +122,6 @@ The bot will:
 - ✅ **Read-only until booking** - Only books when better dates are found
 - ✅ **Respects constraints** - Won't book outside your specified date range
 - ✅ **Graceful exit** - Stops automatically when target is reached
-- ✅ **Error recovery** - Automatically retries on network errors
-- ✅ **Secure credentials** - Uses environment variables for sensitive data
 
 ## Contributing
 
