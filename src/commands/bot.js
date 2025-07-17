@@ -2,7 +2,9 @@ import { Bot } from '../lib/bot.js';
 import { getConfig } from '../lib/config.js';
 import { log, sleep } from '../lib/utils.js';
 
-export async function rescheduleCommand(options) {
+const COOLDOWN = 10 * 60; // 10 minutes
+
+export async function botCommand(options) {
   const config = getConfig();
   const bot = new Bot(config);
   let currentBookedDate = options.current;
@@ -45,10 +47,10 @@ export async function rescheduleCommand(options) {
       await sleep(config.refreshDelay);
     }
   } catch (err) {
-    console.error(err);
-    log("Trying again");
+    console.error(`Error during bot operation: ${err.message}`);
 
-    // Retry the operation
-    return rescheduleCommand(options);
+    log(`Trying again after ${COOLDOWN} seconds...`);
+    await sleep(COOLDOWN);
+    return botCommand(options);
   }
 }

@@ -10,14 +10,14 @@ export class Bot {
   }
 
   async initialize() {
-    log('Initializing visa service...');
+    log('Initializing visa bot...');
     return await this.client.login();
   }
 
   async checkAvailableDate(sessionHeaders, currentBookedDate, minDate) {
     const date = await this.client.checkAvailableDate(
-      sessionHeaders, 
-      this.config.scheduleId, 
+      sessionHeaders,
+      this.config.scheduleId,
       this.config.facilityId
     );
 
@@ -25,12 +25,12 @@ export class Bot {
       log("no dates available");
       return null;
     }
-    
+
     if (date >= currentBookedDate) {
       log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`);
       return null;
     }
-    
+
     if (minDate && date < minDate) {
       log(`nearest date is before minimum date (${date} vs ${minDate})`);
       return null;
@@ -59,7 +59,7 @@ export class Bot {
       date,
       time
     );
-    
+
     log(`booked time at ${date} ${time}`);
     return true;
   }
