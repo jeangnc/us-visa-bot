@@ -2,7 +2,7 @@ import { Bot } from '../lib/bot.js';
 import { getConfig } from '../lib/config.js';
 import { log, sleep } from '../lib/utils.js';
 
-const COOLDOWN = 10 * 60; // 10 minutes
+const COOLDOWN = 3600; // 1 hour in seconds
 
 export async function botCommand(options) {
   const config = getConfig();
@@ -47,9 +47,7 @@ export async function botCommand(options) {
       await sleep(config.refreshDelay);
     }
   } catch (err) {
-    console.error(`Error during bot operation: ${err.message}`);
-
-    log(`Trying again after ${COOLDOWN} seconds...`);
+    log(`Error during bot operation: ${err.message}. Trying again after ${COOLDOWN} seconds...`);
     await sleep(COOLDOWN);
     return botCommand(options);
   }
