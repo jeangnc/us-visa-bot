@@ -35,7 +35,13 @@ export async function botCommand(options) {
         const booked = await bot.bookAppointment(sessionHeaders, availableDate);
 
         if (booked) {
+          // Update current date to the new available date
           currentBookedDate = availableDate;
+
+          options = {
+            ...options,
+            current: currentBookedDate
+          };
 
           if (targetDate && availableDate <= targetDate) {
             log(`Target date reached! Successfully booked appointment on ${availableDate}`);
