@@ -1,10 +1,11 @@
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
 import { log } from './utils.js';
+import { getBaseUri } from './config.js';
 
 export class VisaHttpClient {
-  constructor(baseUri, email, password) {
-    this.baseUri = baseUri;
+  constructor(countryCode, email, password) {
+    this.baseUri = getBaseUri(countryCode);
     this.email = email;
     this.password = password;
   }
