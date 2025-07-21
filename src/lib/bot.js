@@ -15,28 +15,43 @@ export class Bot {
   }
 
   async checkAvailableDate(sessionHeaders, currentBookedDate, minDate) {
-    const date = await this.client.checkAvailableDate(
+    const dates = await this.client.checkAvailableDate(
       sessionHeaders,
       this.config.scheduleId,
       this.config.facilityId
     );
 
-    if (!date) {
+    if (!dates || dates.length === 0) {
       log("no dates available");
       return null;
     }
 
-    if (date >= currentBookedDate) {
-      log(`nearest date is further than already booked (${currentBookedDate} vs ${date})`);
+    // Filter dates that are better than current booked date and after minimum date
+    const goodDates = dates.filter(date => {
+      if (date >= currentBookedDate) {
+        log(`date ${date} is further than already booked (${currentBookedDate})`);
+        return false;
+      }
+
+      if (minDate && date < minDate) {
+        log(`date ${date} is before minimum date (${minDate})`);
+        return false;
+      }
+
+      return true;
+    });
+
+    if (goodDates.length === 0) {
+      log("no good dates found after filtering");
       return null;
     }
 
-    if (minDate && date < minDate) {
-      log(`nearest date is before minimum date (${date} vs ${minDate})`);
-      return null;
-    }
-
-    return date;
+    // Sort dates and return the earliest one
+    goodDates.sort();
+    const earliestDate = goodDates[0];
+    
+    log(`found ${goodDates.length} good dates: ${goodDates.join(', ')}, using earliest: ${earliestDate}`);
+    return earliestDate;
   }
 
   async bookAppointment(sessionHeaders, date) {

@@ -50,7 +50,7 @@ export class VisaHttpClient {
     })
       .then(r => r.json())
       .then(r => this.handleErrors(r))
-      .then(d => d.length > 0 ? d[0]['date'] : null);
+      .then(d => d.map(item => item.date));
   }
 
   async checkAvailableTime(headers, scheduleId, facilityId, date) {
