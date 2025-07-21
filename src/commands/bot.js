@@ -6,12 +6,16 @@ const COOLDOWN = 3600; // 1 hour in seconds
 
 export async function botCommand(options) {
   const config = getConfig();
-  const bot = new Bot(config);
+  const bot = new Bot(config, { dryRun: options.dryRun });
   let currentBookedDate = options.current;
   const targetDate = options.target;
   const minDate = options.min;
 
   log(`Initializing with current date ${currentBookedDate}`);
+
+  if (options.dryRun) {
+    log(`[DRY RUN MODE] Bot will only log what would be booked without actually booking`);
+  }
 
   if (targetDate) {
     log(`Target date: ${targetDate}`);

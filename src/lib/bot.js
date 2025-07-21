@@ -3,8 +3,9 @@ import { getBaseUri } from './config.js';
 import { log } from './utils.js';
 
 export class Bot {
-  constructor(config) {
+  constructor(config, options = {}) {
     this.config = config;
+    this.dryRun = options.dryRun || false;
     this.baseUri = getBaseUri(this.config.locale);
     this.client = new VisaHttpClient(this.baseUri, this.config.email, this.config.password);
   }
@@ -65,6 +66,11 @@ export class Bot {
     if (!time) {
       log(`no available time slots for date ${date}`);
       return false;
+    }
+
+    if (this.dryRun) {
+      log(`[DRY RUN] Would book appointment at ${date} ${time} (not actually booking)`);
+      return true;
     }
 
     await this.client.book(
