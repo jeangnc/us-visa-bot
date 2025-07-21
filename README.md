@@ -41,7 +41,7 @@ Create a `.env` file in the project root with your credentials:
 ```env
 EMAIL=your.email@example.com
 PASSWORD=your_password
-LOCALE=your_locale
+COUNTRY_CODE=your_country_code
 SCHEDULE_ID=your_schedule_id
 FACILITY_ID=your_facility_id
 REFRESH_DELAY=3
@@ -53,8 +53,8 @@ REFRESH_DELAY=3
 |----------|-------------|-------------|
 | `EMAIL` | Your login email | Your credentials for ais.usvisa-info.com |
 | `PASSWORD` | Your login password | Your credentials for ais.usvisa-info.com |
-| `LOCALE` | Your country/language code | Found in URL: `https://ais.usvisa-info.com/{LOCALE}/` <br>Examples: `en-br` (brazil in english), `pt-br` (Brazil in portuguese) |
-| `SCHEDULE_ID` | Your appointment schedule ID | Found in URL when rescheduling: <br>`https://ais.usvisa-info.com/{LOCALE}/niv/schedule/{SCHEDULE_ID}/continue_actions` |
+| `COUNTRY_CODE` | Your country code | Found in URL: `https://ais.usvisa-info.com/en-{COUNTRY_CODE}/` <br>Examples: `br` (Brazil), `fr` (France), `de` (Germany) |
+| `SCHEDULE_ID` | Your appointment schedule ID | Found in URL when rescheduling: <br>`https://ais.usvisa-info.com/en-{COUNTRY_CODE}/niv/schedule/{SCHEDULE_ID}/continue_actions` |
 | `FACILITY_ID` | Your consulate facility ID | Found in network calls when selecting dates, or inspect the date selector dropdown <br>Example: Paris = `44` |
 | `REFRESH_DELAY` | Seconds between checks | Optional, defaults to 3 seconds |
 

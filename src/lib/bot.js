@@ -1,13 +1,11 @@
 import { VisaHttpClient } from './client.js';
-import { getBaseUri } from './config.js';
 import { log } from './utils.js';
 
 export class Bot {
   constructor(config, options = {}) {
     this.config = config;
     this.dryRun = options.dryRun || false;
-    this.baseUri = getBaseUri(this.config.locale);
-    this.client = new VisaHttpClient(this.baseUri, this.config.email, this.config.password);
+    this.client = new VisaHttpClient(this.config.countryCode, this.config.email, this.config.password);
   }
 
   async initialize() {

@@ -8,7 +8,7 @@ export function getConfig() {
     password: process.env.PASSWORD,
     scheduleId: process.env.SCHEDULE_ID,
     facilityId: process.env.FACILITY_ID,
-    locale: process.env.LOCALE,
+    countryCode: process.env.COUNTRY_CODE,
     refreshDelay: Number(process.env.REFRESH_DELAY || 3)
   };
 
@@ -17,7 +17,7 @@ export function getConfig() {
 }
 
 function validateConfig(config) {
-  const required = ['email', 'password', 'scheduleId', 'facilityId', 'locale'];
+  const required = ['email', 'password', 'scheduleId', 'facilityId', 'countryCode'];
   const missing = required.filter(key => !config[key]);
 
   if (missing.length > 0) {
@@ -26,6 +26,6 @@ function validateConfig(config) {
   }
 }
 
-export function getBaseUri(locale) {
-  return `https://ais.usvisa-info.com/${locale}/niv`;
+export function getBaseUri(countryCode) {
+  return `https://ais.usvisa-info.com/en-${countryCode}/niv`;
 }

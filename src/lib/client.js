@@ -31,7 +31,7 @@ export class VisaHttpClient {
         'user[email]': this.email,
         'user[password]': this.password,
         'policy_confirmed': '1',
-        'commit': 'Acessar'
+        'commit': 'Sign In'
       }),
     }).then(res => (
       Object.assign({}, anonymousHeaders, {
