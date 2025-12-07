@@ -13,7 +13,7 @@ export class Bot {
     return await this.client.login();
   }
 
-  async checkAvailableDate(sessionHeaders, currentBookedDate, minDate) {
+  async checkAvailableDate(sessionHeaders, currentBookedDate, minDate, targetDate) {
     const dates = await this.client.checkAvailableDate(
       sessionHeaders,
       this.config.scheduleId,
@@ -34,6 +34,11 @@ export class Bot {
 
       if (minDate && date < minDate) {
         log(`date ${date} is before minimum date (${minDate})`);
+        return false;
+      }
+
+      if (targetDate && date > targetDate) {
+        log(`date ${date} is after target date (${targetDate})`);
         return false;
       }
 
@@ -71,16 +76,21 @@ export class Bot {
       return true;
     }
 
-    await this.client.book(
+    const response = await this.client.book(
       sessionHeaders,
       this.config.scheduleId,
       this.config.facilityId,
       date,
       time
     );
-
-    log(`booked time at ${date} ${time}`);
-    return true;
+    
+    if (response.ok) {
+      log(`booked time at ${date} ${time}`);
+      return true;
+    } else {
+      log(`booking failed for ${date} ${time} - status: ${response.status}`);
+      return false;
+    }
   }
 
 }
