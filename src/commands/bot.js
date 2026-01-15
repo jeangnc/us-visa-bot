@@ -40,15 +40,15 @@ export async function botCommand(options) {
 
         if (booked) {
           // Update current date to the new available date
-          currentBookedDate = availableDate;
+          currentBookedDate = availableDate.date;
 
           options = {
             ...options,
             current: currentBookedDate
           };
 
-          if (targetDate && availableDate <= targetDate) {
-            log(`Target date reached! Successfully booked appointment on ${availableDate}`);
+          if (targetDate && availableDate.date <= targetDate) {
+            log(`Target date reached! Successfully booked appointment on ${availableDate.date} (facility ${availableDate.facilityId})`);
             process.exit(0);
           }
         }

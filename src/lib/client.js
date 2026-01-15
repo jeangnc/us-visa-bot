@@ -142,16 +142,27 @@ export class VisaHttpClient {
   }
 
   _extractRelevantCookies(res) {
-    const parsedCookies = this._parseCookies(res.headers.get('set-cookie'));
-    return `_yatri_session=${parsedCookies['_yatri_session']}`;
+    const raw = res.headers.raw ? res.headers.raw()['set-cookie'] : res.headers.get('set-cookie');
+    const parsedCookies = this._parseCookies(raw);
+    return parsedCookies['_yatri_session'] ? `_yatri_session=${parsedCookies['_yatri_session']}` : '';
   }
 
   _parseCookies(cookies) {
     const parsedCookies = {};
 
-    cookies.split(';').map(c => c.trim()).forEach(c => {
-      const [name, value] = c.split('=', 2);
-      parsedCookies[name] = value;
+    if (!cookies) {
+      return parsedCookies;
+    }
+
+    const cookieString = Array.isArray(cookies) ? cookies.join(',') : cookies;
+
+    cookieString.split(',').forEach(part => {
+      part.split(';').map(c => c.trim()).forEach(c => {
+        const [name, value] = c.split('=', 2);
+        if (name && value) {
+          parsedCookies[name] = value;
+        }
+      });
     });
 
     return parsedCookies;

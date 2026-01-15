@@ -43,7 +43,7 @@ EMAIL=your.email@example.com
 PASSWORD=your_password
 COUNTRY_CODE=your_country_code
 SCHEDULE_ID=your_schedule_id
-FACILITY_ID=your_facility_id
+FACILITY_IDS=fac1,fac2   # comma-separated, or single FACILITY_ID
 REFRESH_DELAY=3
 ```
 
@@ -55,7 +55,8 @@ REFRESH_DELAY=3
 | `PASSWORD` | Your login password | Your credentials for ais.usvisa-info.com |
 | `COUNTRY_CODE` | Your country code | Found in URL: `https://ais.usvisa-info.com/en-{COUNTRY_CODE}/` <br>Examples: `br` (Brazil), `fr` (France), `de` (Germany) |
 | `SCHEDULE_ID` | Your appointment schedule ID | Found in URL when rescheduling: <br>`https://ais.usvisa-info.com/en-{COUNTRY_CODE}/niv/schedule/{SCHEDULE_ID}/continue_actions` |
-| `FACILITY_ID` | Your consulate facility ID | Found in network calls when selecting dates, or inspect the date selector dropdown <br>Example: Paris = `44` |
+| `FACILITY_IDS` | One or more consulate facility IDs, comma-separated | Found in network calls when selecting dates, or inspect the date selector dropdown <br>Example: Paris = `44` |
+| `FACILITY_ID` | (Optional legacy) Single facility ID if you prefer | Same as above |
 | `REFRESH_DELAY` | Seconds between checks | Optional, defaults to 3 seconds |
 
 ## Usage

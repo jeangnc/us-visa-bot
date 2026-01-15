@@ -14,72 +14,78 @@ export class Bot {
   }
 
   async checkAvailableDate(sessionHeaders, currentBookedDate, minDate) {
-    const dates = await this.client.checkAvailableDate(
-      sessionHeaders,
-      this.config.scheduleId,
-      this.config.facilityId
-    );
+    let best = null;
 
-    if (!dates || dates.length === 0) {
-      log("no dates available");
-      return null;
-    }
+    for (const facilityId of this.config.facilityIds) {
+      const dates = await this.client.checkAvailableDate(
+        sessionHeaders,
+        this.config.scheduleId,
+        facilityId
+      );
 
-    // Filter dates that are better than current booked date and after minimum date
-    const goodDates = dates.filter(date => {
-      if (date >= currentBookedDate) {
-        log(`date ${date} is further than already booked (${currentBookedDate})`);
-        return false;
+      if (!dates || dates.length === 0) {
+        log(`no dates available for facility ${facilityId}`);
+        continue;
       }
 
-      if (minDate && date < minDate) {
-        log(`date ${date} is before minimum date (${minDate})`);
-        return false;
+      const goodDates = dates.filter(date => {
+        if (date >= currentBookedDate) {
+        log(`facility ${facilityId}: date ${date} is further than already booked (${currentBookedDate})`);
+          return false;
+        }
+
+        if (minDate && date < minDate) {
+          log(`facility ${facilityId}: date ${date} is before minimum date (${minDate})`);
+          return false;
+        }
+
+        return true;
+      });
+
+      if (goodDates.length === 0) {
+        log(`facility ${facilityId}: no good dates found after filtering`);
+        continue;
       }
 
-      return true;
-    });
+      goodDates.sort();
+      const earliestDate = goodDates[0];
+      log(`facility ${facilityId}: found ${goodDates.length} good dates: ${goodDates.join(', ')}, earliest: ${earliestDate}`);
 
-    if (goodDates.length === 0) {
-      log("no good dates found after filtering");
-      return null;
+      if (!best || earliestDate < best.date) {
+        best = { date: earliestDate, facilityId };
+      }
     }
 
-    // Sort dates and return the earliest one
-    goodDates.sort();
-    const earliestDate = goodDates[0];
-    
-    log(`found ${goodDates.length} good dates: ${goodDates.join(', ')}, using earliest: ${earliestDate}`);
-    return earliestDate;
+    return best;
   }
 
-  async bookAppointment(sessionHeaders, date) {
+  async bookAppointment(sessionHeaders, { date, facilityId }) {
     const time = await this.client.checkAvailableTime(
       sessionHeaders,
       this.config.scheduleId,
-      this.config.facilityId,
+      facilityId,
       date
     );
 
     if (!time) {
-      log(`no available time slots for date ${date}`);
+      log(`no available time slots for facility ${facilityId} on date ${date}`);
       return false;
     }
 
     if (this.dryRun) {
-      log(`[DRY RUN] Would book appointment at ${date} ${time} (not actually booking)`);
+      log(`[DRY RUN] Would book appointment at facility ${facilityId} ${date} ${time} (not actually booking)`);
       return true;
     }
 
     await this.client.book(
       sessionHeaders,
       this.config.scheduleId,
-      this.config.facilityId,
+      facilityId,
       date,
       time
     );
 
-    log(`booked time at ${date} ${time}`);
+    log(`booked time at facility ${facilityId} ${date} ${time}`);
     return true;
   }
 
