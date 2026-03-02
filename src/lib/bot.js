@@ -13,10 +13,11 @@ export class Bot {
     return await this.client.login();
   }
 
-  async checkAvailableDate(sessionHeaders, currentBookedDate, minDate) {
+  async checkAvailableDate(sessionHeaders, currentBookedDate, minDate, targetDate) {
     let best = null;
 
     for (const facilityId of this.config.facilityIds) {
+      log(`checking dates for facility ${facilityId}`);
       const dates = await this.client.checkAvailableDate(
         sessionHeaders,
         this.config.scheduleId,
@@ -24,32 +25,27 @@ export class Bot {
       );
 
       if (!dates || dates.length === 0) {
-        log(`no dates available for facility ${facilityId}`);
+        log(`facility ${facilityId}: no dates available`);
         continue;
       }
 
-      const goodDates = dates.filter(date => {
-        if (date >= currentBookedDate) {
-        log(`facility ${facilityId}: date ${date} is further than already booked (${currentBookedDate})`);
-          return false;
-        }
+      const sortedDates = [...dates].sort();
+      const nearestAvailable = sortedDates[0];
+      log(`facility ${facilityId}: nearest available date ${nearestAvailable}`);
 
-        if (minDate && date < minDate) {
-          log(`facility ${facilityId}: date ${date} is before minimum date (${minDate})`);
-          return false;
-        }
-
-        return true;
-      });
+      const goodDates = sortedDates.filter(date =>
+        date < currentBookedDate &&
+        (!targetDate || date <= targetDate) &&
+        (!minDate || date >= minDate)
+      );
 
       if (goodDates.length === 0) {
         log(`facility ${facilityId}: no good dates found after filtering`);
         continue;
       }
 
-      goodDates.sort();
       const earliestDate = goodDates[0];
-      log(`facility ${facilityId}: found ${goodDates.length} good dates: ${goodDates.join(', ')}, earliest: ${earliestDate}`);
+      log(`facility ${facilityId}: earliest acceptable date ${earliestDate}`);
 
       if (!best || earliestDate < best.date) {
         best = { date: earliestDate, facilityId };
@@ -60,6 +56,7 @@ export class Bot {
   }
 
   async bookAppointment(sessionHeaders, { date, facilityId }) {
+    log(`checking time slots for facility ${facilityId} on ${date}`);
     const time = await this.client.checkAvailableTime(
       sessionHeaders,
       this.config.scheduleId,
@@ -68,7 +65,7 @@ export class Bot {
     );
 
     if (!time) {
-      log(`no available time slots for facility ${facilityId} on date ${date}`);
+      log(`facility ${facilityId}: no available time slots on ${date}`);
       return false;
     }
 

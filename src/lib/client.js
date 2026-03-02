@@ -20,11 +20,12 @@ export class VisaHttpClient {
 
   // Public API methods
   async login() {
-    log('Logging in');
+    log('Logging in (GET login page for CSRF + cookie)');
 
     const anonymousHeaders = await this._anonymousRequest(`${this.baseUri}/users/sign_in`)
       .then(response => this._extractHeaders(response));
 
+    log('Submitting login form');
     const loginData = {
       'utf8': '✓',
       'user[email]': this.email,
@@ -42,6 +43,7 @@ export class VisaHttpClient {
 
   async checkAvailableDate(headers, scheduleId, facilityId) {
     const url = `${this.baseUri}/schedule/${scheduleId}/appointment/days/${facilityId}.json?appointments[expedite]=false`;
+    log(`GET dates ${url}`);
     
     return this._jsonRequest(url, headers)
       .then(data => data.map(item => item.date));
@@ -49,6 +51,7 @@ export class VisaHttpClient {
 
   async checkAvailableTime(headers, scheduleId, facilityId, date) {
     const url = `${this.baseUri}/schedule/${scheduleId}/appointment/times/${facilityId}.json?date=${date}&appointments[expedite]=false`;
+    log(`GET times ${url}`);
     
     return this._jsonRequest(url, headers)
       .then(data => data['business_times'][0] || data['available_times'][0]);
@@ -73,33 +76,49 @@ export class VisaHttpClient {
       'appointments[asc_appointment][time]': ''
     };
 
-    return this._submitFormWithRedirect(url, bookingHeaders, bookingData);
+    const res = await this._submitFormWithRedirect(url, bookingHeaders, bookingData);
+    const text = await res.text();
+    const bodyPreview = text.length > 500 ? `${text.slice(0, 500)}...` : text;
+    log(`Book response: status=${res.status}, body=${bodyPreview}`);
+
+    if (!res.ok) {
+      throw new Error(`Booking failed: HTTP ${res.status} - ${text.slice(0, 200)}`);
+    }
+
+    return res;
   }
 
   // Private request methods
   async _anonymousRequest(url, headers = {}) {
     return fetch(url, {
       headers: {
-        "User-Agent": "",
-        "Accept": "*/*",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
+        ...COMMON_HEADERS,
         ...headers
       }
     });
   }
 
   async _jsonRequest(url, headers = {}) {
-    return fetch(url, {
+    const res = await fetch(url, {
       headers: {
         ...headers,
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest"
       },
       cache: "no-store"
-    })
-      .then(r => r.json())
-      .then(r => this._handleErrors(r));
+    });
+    const text = await res.text();
+    try {
+      const data = JSON.parse(text);
+      return this._handleErrors(data);
+    } catch (parseErr) {
+      const isHtml = text.trimStart().startsWith('<');
+      if (isHtml) {
+        log('Server returned HTML instead of JSON');
+        throw new Error('Server returned HTML instead of JSON');
+      }
+      throw parseErr;
+    }
   }
 
   async _submitForm(url, headers = {}, formData = {}) {
