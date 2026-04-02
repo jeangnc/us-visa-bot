@@ -5,7 +5,7 @@ import { getBaseUri } from './config.js';
 
 // Common headers
 const COMMON_HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
   'Accept-Encoding': 'gzip, deflate, br',
   'Connection': 'keep-alive',
   'Cache-Control': 'no-store'
@@ -98,7 +98,13 @@ export class VisaHttpClient {
       },
       cache: "no-store"
     })
-      .then(r => r.json())
+      .then(async r => {
+        const contentType = r.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error(`Expected JSON but got ${contentType}. Possible WAF blocking.`);
+        }
+        return r.json();
+      })
       .then(r => this._handleErrors(r));
   }
 
@@ -142,8 +148,11 @@ export class VisaHttpClient {
   }
 
   _extractRelevantCookies(res) {
-    const parsedCookies = this._parseCookies(res.headers.get('set-cookie'));
-    return `_yatri_session=${parsedCookies['_yatri_session']}`;
+    const setCookie = res.headers.get('set-cookie');
+    if (!setCookie) return '';
+
+    const parsedCookies = this._parseCookies(setCookie);
+    return parsedCookies['_yatri_session'] ? `_yatri_session=${parsedCookies['_yatri_session']}` : '';
   }
 
   _parseCookies(cookies) {
