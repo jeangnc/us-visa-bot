@@ -20,8 +20,8 @@ export class Bot {
       this.config.facilityId
     );
 
-    if (!dates || dates.length === 0) {
-      log("no dates available");
+    if (!Array.isArray(dates) || dates.length === 0) {
+      log("no dates available or invalid payload");
       return null;
     }
 
