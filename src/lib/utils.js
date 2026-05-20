@@ -4,6 +4,10 @@ export function sleep(seconds) {
   });
 }
 
+export function randomDelay(minSeconds, maxSeconds) {
+  return Math.random() * (maxSeconds - minSeconds) + minSeconds;
+}
+
 export function log(message) {
   console.log(`[${new Date().toISOString()}]`, message);
 }

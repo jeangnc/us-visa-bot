@@ -1,6 +1,6 @@
 import { Bot } from '../lib/bot.js';
 import { getConfig } from '../lib/config.js';
-import { log, sleep, isSocketHangupError } from '../lib/utils.js';
+import { log, sleep, randomDelay, isSocketHangupError } from '../lib/utils.js';
 
 const COOLDOWN = 3600; // 1 hour in seconds
 
@@ -54,7 +54,9 @@ export async function botCommand(options) {
         }
       }
 
-      await sleep(config.refreshDelay);
+      const delay = randomDelay(config.refreshDelayMin, config.refreshDelayMax);
+      log(`Sleeping for ${delay.toFixed(1)}s before next check`);
+      await sleep(delay);
     }
   } catch (err) {
     if (isSocketHangupError(err)) {
