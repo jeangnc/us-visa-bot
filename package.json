@@ -10,7 +10,7 @@
     "lint": "echo \"No linter configured\"",
     "dev": "node src/index.js"
   },
-  "author": "",
+  "author": "Jean Carlos Gonçalves",
   "license": "PolyForm-Noncommercial-1.0.0",
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
