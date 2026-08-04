@@ -134,7 +134,13 @@ The bot will:
 
 ## License
 
-This project is licensed under the ISC License.
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+
+Commercial use is not permitted. You may use, modify, and distribute this
+software for noncommercial purposes — personal use, research, education, and
+use by nonprofit and government organizations. Selling it, offering it as a
+paid service, or using it as part of a commercial offering requires a separate
+license. Contact the copyright holder to discuss commercial terms.
 
 ## Disclaimer
 
