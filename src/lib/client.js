@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import cheerio from 'cheerio';
+import { writeFile } from 'node:fs/promises';
 import { log } from './utils.js';
 import { getBaseUri } from './config.js';
 
@@ -40,40 +41,92 @@ export class VisaHttpClient {
       }));
   }
 
-  async checkAvailableDate(headers, scheduleId, facilityId) {
-    const url = `${this.baseUri}/schedule/${scheduleId}/appointment/days/${facilityId}.json?appointments[expedite]=false`;
-    
+  // `query` scopes ASC lookups to a consulate slot: &consulate_id=..&consulate_date=..&consulate_time=..
+  async checkAvailableDate(headers, scheduleId, facilityId, query = '') {
+    const url = `${this.baseUri}/schedule/${scheduleId}/appointment/days/${facilityId}.json?appointments[expedite]=false${query}`;
+
     return this._jsonRequest(url, headers)
       .then(data => data.map(item => item.date));
   }
 
-  async checkAvailableTime(headers, scheduleId, facilityId, date) {
-    const url = `${this.baseUri}/schedule/${scheduleId}/appointment/times/${facilityId}.json?date=${date}&appointments[expedite]=false`;
-    
+  async checkAvailableTime(headers, scheduleId, facilityId, date, query = '') {
+    const url = `${this.baseUri}/schedule/${scheduleId}/appointment/times/${facilityId}.json?date=${date}&appointments[expedite]=false${query}`;
+
     return this._jsonRequest(url, headers)
       .then(data => data['business_times'][0] || data['available_times'][0]);
   }
 
-  async book(headers, scheduleId, facilityId, date, time) {
+  // "You have N remaining attempt(s)" from the scheduling limit warning; null when the account has no limit
+  async remainingAttempts(headers, scheduleId) {
+    const { $ } = await this._anonymousRequest(`${this.baseUri}/schedule/${scheduleId}/appointment`, headers)
+      .then(response => this._loadPage(response));
+    const match = $('body').text().match(/You have (\d+) remaining attempt/);
+    return match ? Number(match[1]) : null;
+  }
+
+  // e.g. "Consular Appointment: 4 March, 2027, 07:30 ..." as shown on the group page
+  async currentAppointment(headers, scheduleId) {
+    const actions = await this._anonymousRequest(`${this.baseUri}/schedule/${scheduleId}/continue_actions`, headers)
+      .then(response => this._loadPage(response));
+    const groupHref = actions.$('a[href*="/groups/"]').attr('href');
+    if (!groupHref) return '';
+
+    const { $ } = await this._anonymousRequest(new URL(groupHref, this.baseUri).href, actions.headers)
+      .then(response => this._loadPage(response));
+    return $('.consular-appt').first().text().replace(/\s+/g, ' ').trim();
+  }
+
+  // Returns true when the form was submitted (or would be, in dry-run); confirmation is up to the caller
+  async book(headers, scheduleId, facilityId, date, time, asc = null, dryRun = false) {
     const url = `${this.baseUri}/schedule/${scheduleId}/appointment`;
 
-    const bookingHeaders = await this._anonymousRequest(url, headers)
-      .then(response => this._extractHeaders(response));
+    // Same GET forms the browser walks: limit warning ("I understand") -> applicant picker -> reschedule form
+    let page = await this._anonymousRequest(`${url}?confirmed_limit_message=1&commit=Continue`, headers)
+      .then(response => this._loadPage(response));
 
+    // Group schedules: select every applicant, "Continue" stores the selection in the session
+    const applicants = page.$('input[name="applicants[]"]').map((_, el) => page.$(el).val()).get();
+    if (applicants.length > 0) {
+      log(`group schedule, selecting applicants: ${applicants.join(', ')}`);
+      const query = new URLSearchParams([
+        ...applicants.map(id => ['applicants[]', id]),
+        ['confirmed_limit_message', '1'],
+        ['commit', 'Continue']
+      ]);
+      page = await this._anonymousRequest(`${url}?${query}`, page.headers)
+        .then(response => this._loadPage(response));
+    }
+
+    if (page.$('#appointments_consulate_appointment_facility_id').length === 0) {
+      log('reschedule form not reached, not posting');
+      return false;
+    }
+
+    // Mirror the form exactly: its own token and the submit button value
     const bookingData = {
-      'utf8': '✓',
-      'authenticity_token': bookingHeaders['X-CSRF-Token'],
+      'authenticity_token': page.$('#appointment-form input[name="authenticity_token"]').val() || page.headers['X-CSRF-Token'],
       'confirmed_limit_message': '1',
       'use_consulate_appointment_capacity': 'true',
       'appointments[consulate_appointment][facility_id]': facilityId,
       'appointments[consulate_appointment][date]': date,
       'appointments[consulate_appointment][time]': time,
-      'appointments[asc_appointment][facility_id]': '',
-      'appointments[asc_appointment][date]': '',
-      'appointments[asc_appointment][time]': ''
+      'appointments[asc_appointment][facility_id]': asc?.facilityId ?? '',
+      'appointments[asc_appointment][date]': asc?.date ?? '',
+      'appointments[asc_appointment][time]': asc?.time ?? '',
+      'commit': page.$('#appointments_submit').val() || 'Reschedule'
     };
 
-    return this._submitFormWithRedirect(url, bookingHeaders, bookingData);
+    if (dryRun) {
+      const token = bookingData.authenticity_token ? '<ok>' : '<MISSING>';
+      log(`[DRY RUN] would POST ${JSON.stringify({ ...bookingData, authenticity_token: token })}`);
+      return true;
+    }
+
+    const res = await this._submitFormWithRedirect(url, page.headers, bookingData);
+    // The site's response is the only record of why a booking was not applied
+    await writeFile('last-booking-response.html', await res.text());
+    log(`booking response: ${res.status} ${res.url} (saved to last-booking-response.html)`);
+    return true;
   }
 
   // Private request methods
@@ -127,17 +180,25 @@ export class VisaHttpClient {
 
   // Private utility methods
   async _extractHeaders(res) {
+    return (await this._loadPage(res)).headers;
+  }
+
+  // Reads the body once and returns both the session headers and the parsed page
+  async _loadPage(res) {
     const cookies = this._extractRelevantCookies(res);
     const html = await res.text();
     const $ = cheerio.load(html);
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
     return {
-      ...COMMON_HEADERS,
-      "Cookie": cookies,
-      "X-CSRF-Token": csrfToken,
-      "Referer": this.baseUri,
-      "Referrer-Policy": "strict-origin-when-cross-origin"
+      $,
+      headers: {
+        ...COMMON_HEADERS,
+        "Cookie": cookies,
+        "X-CSRF-Token": csrfToken,
+        "Referer": this.baseUri,
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      }
     };
   }
 
