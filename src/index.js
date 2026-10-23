@@ -14,6 +14,7 @@ program
   .requiredOption('-c, --current <date>', 'current booked date')
   .option('-t, --target <date>', 'target date to stop at')
   .option('-m, --min <date>', 'minimum date acceptable')
+  .option('--max <date>', 'latest date acceptable (overrides MAX_DATE)')
   .option('--dry-run', 'only log what would be booked without actually booking')
   .action(botCommand);
 
@@ -22,6 +23,7 @@ program
   .requiredOption('-c, --current <date>', 'current booked date')
   .option('-t, --target <date>', 'target date to stop at')
   .option('-m, --min <date>', 'minimum date acceptable')
+  .option('--max <date>', 'latest date acceptable (overrides MAX_DATE)')
   .option('--dry-run', 'only log what would be booked without actually booking')
   .action(botCommand);
 
