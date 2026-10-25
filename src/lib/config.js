@@ -21,7 +21,9 @@ function validateConfig(config) {
   const missing = required.filter(key => !config[key]);
 
   if (missing.length > 0) {
-    console.error(`Missing required environment variables: ${missing.map(k => k.toUpperCase()).join(', ')}`);
+    // countryCode -> COUNTRY_CODE, so the message names the variable the user actually has to set
+    const envName = key => key.replace(/[A-Z]/g, c => `_${c}`).toUpperCase();
+    console.error(`Missing required environment variables: ${missing.map(envName).join(', ')}`);
     process.exit(1);
   }
 }

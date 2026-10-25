@@ -17,7 +17,7 @@ The bot logs into your account on https://ais.usvisa-info.com/ and checks for av
 
 ## Prerequisites
 
-- Node.js 16+ 
+- Node.js 20+ (required by the `commander` dependency)
 - A valid US visa interview appointment
 - Access to https://ais.usvisa-info.com/
 
@@ -25,7 +25,7 @@ The bot logs into your account on https://ais.usvisa-info.com/ and checks for av
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/us-visa-bot.git
+git clone https://github.com/jeangnc/us-visa-bot.git
 cd us-visa-bot
 ```
 
@@ -36,7 +36,13 @@ npm install
 
 ## Configuration
 
-Create a `.env` file in the project root with your credentials:
+Copy `.env.example` to `.env` in the project root and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+The variables are:
 
 ```env
 EMAIL=your.email@example.com
@@ -63,7 +69,7 @@ REFRESH_DELAY=3
 Run the bot with your current appointment date:
 
 ```bash
-node index.js -c <current_date> [-t <target_date>] [-m <min_date>]
+npm start -- -c <current_date> [-t <target_date>] [-m <min_date>] [--dry-run]
 ```
 
 ### Command Line Arguments
@@ -73,24 +79,28 @@ node index.js -c <current_date> [-t <target_date>] [-m <min_date>]
 | `-c` | `--current` | ✅ | Your current booked interview date (YYYY-MM-DD) |
 | `-t` | `--target` | ❌ | Target date to stop at - exits successfully when reached |
 | `-m` | `--min` | ❌ | Minimum acceptable date - skips dates before this |
+|  | `--dry-run` | ❌ | Only log what would be booked, without booking |
 
 ### Examples
 
 ```bash
 # Basic usage - reschedule to any earlier date
-node index.js -c 2023-06-15
+npm start -- -c 2023-06-15
 
 # With target date - stop when you get June 1st or earlier  
-node index.js -c 2023-06-15 -t 2023-06-01
+npm start -- -c 2023-06-15 -t 2023-06-01
 
 # With minimum date - only accept dates after May 1st
-node index.js -c 2023-06-15 -m 2023-05-01
+npm start -- -c 2023-06-15 -m 2023-05-01
 
 # With both constraints - only book between May 1st and June 1st
-node index.js -c 2023-06-15 -t 2023-06-01 -m 2023-05-01
+npm start -- -c 2023-06-15 -t 2023-06-01 -m 2023-05-01
+
+# Dry run - log in and check dates, but never book
+npm start -- -c 2023-06-15 --dry-run
 
 # Get help
-node index.js --help
+npm start -- --help
 ```
 
 ## How It Behaves
@@ -111,8 +121,11 @@ The bot will:
 [2023-07-16T10:30:00.000Z] Initializing with current date 2023-08-15
 [2023-07-16T10:30:00.000Z] Target date: 2023-07-01
 [2023-07-16T10:30:00.000Z] Minimum date: 2023-06-01
+[2023-07-16T10:30:01.000Z] Initializing visa bot...
 [2023-07-16T10:30:01.000Z] Logging in
-[2023-07-16T10:30:03.000Z] nearest date is further than already booked (2023-08-15 vs 2023-09-01)
+[2023-07-16T10:30:03.000Z] date 2023-09-01 is further than already booked (2023-08-15)
+[2023-07-16T10:30:03.000Z] no good dates found after filtering
+[2023-07-16T10:30:06.000Z] found 1 good dates: 2023-07-15, using earliest: 2023-07-15
 [2023-07-16T10:30:06.000Z] booked time at 2023-07-15 09:00
 [2023-07-16T10:30:06.000Z] Target date reached! Successfully booked appointment on 2023-07-15
 ```
