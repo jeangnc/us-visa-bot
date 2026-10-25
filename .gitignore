@@ -1,2 +1,4 @@
 node_modules/*
 .env
+last-booking-response.html
+bot.log
