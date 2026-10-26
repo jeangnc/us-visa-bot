@@ -68,7 +68,7 @@ export class Bot {
 
     if (this.dryRun) {
       log(`[DRY RUN] Would book appointment at ${date} ${time} (not actually booking)`);
-      return true;
+      return time;
     }
 
     await this.client.book(
@@ -80,7 +80,7 @@ export class Bot {
     );
 
     log(`booked time at ${date} ${time}`);
-    return true;
+    return time;
   }
 
 }

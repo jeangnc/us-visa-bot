@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"No linter configured\"",
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "test-email": "node src/test-email.js"
   },
   "author": "Jean Carlos Gonçalves",
   "license": "PolyForm-Noncommercial-1.0.0",
@@ -16,6 +17,7 @@
     "cheerio": "^1.0.0-rc.12",
     "commander": "^14.0.0",
     "dotenv": "^16.4.7",
-    "node-fetch": "^3.3.0"
+    "node-fetch": "^3.3.0",
+    "nodemailer": "^10.2.1"
   }
 }

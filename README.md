@@ -9,6 +9,7 @@ An automated bot that monitors and reschedules US visa interview appointments to
 - 🎯 Configurable target and minimum date constraints
 - 🚨 Exits successfully when target date is reached
 - 📊 Detailed logging with timestamps
+- 📧 Optional email notifications for bookings and failures
 - 🔐 Secure authentication with environment variables
 
 ## How It Works
@@ -57,6 +58,33 @@ REFRESH_DELAY=3
 | `SCHEDULE_ID` | Your appointment schedule ID | Found in URL when rescheduling: <br>`https://ais.usvisa-info.com/en-{COUNTRY_CODE}/niv/schedule/{SCHEDULE_ID}/continue_actions` |
 | `FACILITY_ID` | Your consulate facility ID | Found in network calls when selecting dates, or inspect the date selector dropdown <br>Example: Paris = `44` |
 | `REFRESH_DELAY` | Seconds between checks | Optional, defaults to 3 seconds |
+
+### Email Notifications (optional)
+
+The bot can email you when it books an appointment, when it keeps failing to check dates (5 errors in a row, e.g. wrong password, site changes or blocking), and when it recovers. Add an SMTP account to `.env`:
+
+```env
+NOTIFY_EMAIL=you@example.com
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=you@gmail.com
+SMTP_PASS=your_app_password
+```
+
+| Variable | Description |
+|----------|-------------|
+| `NOTIFY_EMAIL` | Where notifications are sent |
+| `SMTP_HOST` / `SMTP_PORT` | Your mail server. Defaults to `smtp.gmail.com` / `587`; port `465` uses TLS from the start |
+| `SMTP_USER` / `SMTP_PASS` | Your SMTP login. For Gmail, use an [app password](https://myaccount.google.com/apppasswords) (needs 2-Step Verification), not your normal password |
+| `NOTIFY_FROM` | Optional sender, defaults to `SMTP_USER` |
+
+Check the settings with a test email:
+
+```bash
+npm run test-email
+```
+
+If these variables are not set, the bot runs exactly as before and only logs that email is not configured.
 
 ## Usage
 
