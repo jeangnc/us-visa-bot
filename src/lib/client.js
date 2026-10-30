@@ -76,6 +76,21 @@ export class VisaHttpClient {
     return this._submitFormWithRedirect(url, bookingHeaders, bookingData);
   }
 
+  // Consular appointments listed on the account page, e.g. "12 August, 2027, 07:40"
+  // -> [{ date: '2027-08-12', time: '07:40' }]
+  async consularAppointments(headers) {
+    const res = await fetch(`${this.baseUri}/account`, { headers: { ...headers, 'Accept': 'text/html' } });
+    const $ = cheerio.load(await res.text());
+    if (res.url.includes('/users/sign_in')) throw new Error('session expired');
+    const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+    const found = [];
+    for (const [, d, month, y, time] of $('.consular-appt').text().matchAll(/(\d{1,2}) ([A-Za-z]+),? (\d{4}),? (\d{1,2}:\d{2})/g)) {
+      const m = months.indexOf(month.toLowerCase());
+      if (m >= 0) found.push({ date: `${y}-${String(m + 1).padStart(2, '0')}-${d.padStart(2, '0')}`, time: time.padStart(5, '0') });
+    }
+    return found;
+  }
+
   // Private request methods
   async _anonymousRequest(url, headers = {}) {
     return fetch(url, {

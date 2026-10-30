@@ -8,10 +8,14 @@
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"No linter configured\"",
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "watch": "node scripts/watch.mjs"
   },
   "author": "Jean Carlos Gonçalves",
   "license": "PolyForm-Noncommercial-1.0.0",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "commander": "^14.0.0",
