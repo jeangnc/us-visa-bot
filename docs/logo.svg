@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <!-- speed lines: an earlier date, sooner -->
+  <g stroke="#c7d2fe" stroke-width="3" stroke-linecap="round" opacity=".85">
+    <path d="M6 31h7"/>
+    <path d="M4 38h9"/>
+    <path d="M7 45h6"/>
+  </g>
+  <!-- calendar -->
+  <rect x="17" y="17" width="38" height="34" rx="7" fill="#fff"/>
+  <path d="M17 24a7 7 0 0 1 7-7h24a7 7 0 0 1 7 7v4H17z" fill="#e0e7ff"/>
+  <rect x="25" y="12" width="5" height="10" rx="2.5" fill="#1e1b4b"/>
+  <rect x="42" y="12" width="5" height="10" rx="2.5" fill="#1e1b4b"/>
+  <!-- booked -->
+  <path d="M27 39.5l5.5 5.5L45 32.5" fill="none" stroke="#4f46e5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

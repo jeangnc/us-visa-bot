@@ -1,17 +1,26 @@
 {
   "name": "us-visa-bot",
   "version": "0.0.1",
-  "description": "",
+  "description": "US Visa Bot: finds an earlier US visa interview appointment and books it, with a local dashboard",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"No linter configured\"",
-    "dev": "node src/index.js"
+    "dev": "node src/index.js",
+    "dev": "node src/index.js",
+    "watch": "node scripts/watch.mjs",
+    "ui": "node scripts/launch.js",
+    "ui:autostart": "node scripts/autostart.js on",
+    "ui:autostart:off": "node scripts/autostart.js off",
+    "ui:stop": "node scripts/stop.js"
   },
   "author": "Jean Carlos Gonçalves",
   "license": "PolyForm-Noncommercial-1.0.0",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "commander": "^14.0.0",

@@ -1,0 +1,1848 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>US Visa Bot · Early Appointment Finder</title>
+<script>try { const t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%234f46e5'/><stop offset='1' stop-color='%237c3aed'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><rect x='10' y='14' width='44' height='40' rx='8' fill='%23fff'/><path d='M10 22a8 8 0 0 1 8-8h28a8 8 0 0 1 8 8v4H10z' fill='%23e0e7ff'/><rect x='19' y='7' width='6' height='12' rx='3' fill='%231e1b4b'/><rect x='39' y='7' width='6' height='12' rx='3' fill='%231e1b4b'/><path d='M21 38l7 7 15-15' fill='none' stroke='%234f46e5' stroke-width='6.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f3f5fb; --bg-glow-1: rgba(99, 102, 241, .10); --bg-glow-2: rgba(16, 185, 129, .07);
+    --panel: #ffffff; --panel-hi: #ffffff; --field: #f6f7fc; --field-hover: #eef1f8; --edge: transparent; --sunk: #f6f7fc; --hover: #f0f2fa; --chip: #ffffff;
+    --text: #0f172a; --text-2: #334155; --muted: #64748b; --faint: #a3adc2; --line: #e2e6f0; --grid: #edf0f7;
+    --accent: #4f46e5; --accent-2: #7c3aed; --on-accent: #ffffff; --glow: none;
+    --good: #059669; --good-bg: #e6f7ef; --on-good: #ffffff; --go-1: #10b981; --go-2: #047857;
+    --warn: #d97706; --warn-bg: #fef3e0;
+    --bad: #e11d48; --bad-solid: #e11d48; --bad-bg: #ffe8ed; --on-bad: #ffffff;
+    --info: #7c3aed; --session: #0284c7;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+    --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 6px 20px rgba(15, 23, 42, .05);
+    --shadow-lg: 0 20px 50px rgba(15, 23, 42, .18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #07090f; --bg-glow-1: rgba(99, 102, 241, .17); --bg-glow-2: rgba(16, 185, 129, .07);
+      --panel: #0e121c; --panel-hi: #141a29; --field: rgba(255, 255, 255, .045); --field-hover: rgba(255, 255, 255, .07); --edge: rgba(255, 255, 255, .06); --sunk: #0a0d15; --hover: rgba(255, 255, 255, .035); --chip: rgba(255, 255, 255, .04);
+      --text: #eef1f8; --text-2: #c5cbd9; --muted: #8a93a8; --faint: #4b5368; --line: rgba(255, 255, 255, .08); --grid: rgba(255, 255, 255, .05);
+      --accent: #8b93ff; --accent-2: #b48cff; --on-accent: #0b0d18; --glow: 0 0 0 1px rgba(139, 147, 255, .22), 0 10px 40px -8px rgba(139, 147, 255, .28);
+      --good: #34d399; --good-bg: rgba(52, 211, 153, .12); --on-good: #03140d; --go-1: #10b981; --go-2: #059669;
+      --warn: #fbbf24; --warn-bg: rgba(251, 191, 36, .12);
+      --bad: #fb7185; --bad-solid: #f43f5e; --bad-bg: rgba(251, 113, 133, .12); --on-bad: #ffffff;
+      --info: #b48cff; --session: #38bdf8;
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 12px 32px -12px rgba(0, 0, 0, .6);
+      --shadow-lg: 0 24px 70px rgba(0, 0, 0, .7);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #07090f; --bg-glow-1: rgba(99, 102, 241, .17); --bg-glow-2: rgba(16, 185, 129, .07);
+    --panel: #0e121c; --panel-hi: #141a29; --field: rgba(255, 255, 255, .045); --field-hover: rgba(255, 255, 255, .07); --edge: rgba(255, 255, 255, .06); --sunk: #0a0d15; --hover: rgba(255, 255, 255, .035); --chip: rgba(255, 255, 255, .04);
+    --text: #eef1f8; --text-2: #c5cbd9; --muted: #8a93a8; --faint: #4b5368; --line: rgba(255, 255, 255, .08); --grid: rgba(255, 255, 255, .05);
+    --accent: #8b93ff; --accent-2: #b48cff; --on-accent: #0b0d18; --glow: 0 0 0 1px rgba(139, 147, 255, .22), 0 10px 40px -8px rgba(139, 147, 255, .28);
+    --good: #34d399; --good-bg: rgba(52, 211, 153, .12); --on-good: #03140d; --go-1: #10b981; --go-2: #059669;
+    --warn: #fbbf24; --warn-bg: rgba(251, 191, 36, .12);
+    --bad: #fb7185; --bad-solid: #f43f5e; --bad-bg: rgba(251, 113, 133, .12); --on-bad: #ffffff;
+    --info: #b48cff; --session: #38bdf8;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 12px 32px -12px rgba(0, 0, 0, .6);
+    --shadow-lg: 0 24px 70px rgba(0, 0, 0, .7);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--text); background-color: var(--bg);
+    background-image: radial-gradient(1100px 520px at -5% -10%, var(--bg-glow-1), transparent 60%), radial-gradient(900px 480px at 105% 0%, var(--bg-glow-2), transparent 60%);
+    background-attachment: fixed;
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .num { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  [hidden] { display: none !important; }
+  ::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+
+  /* ---------- Top bar ---------- */
+  .bar { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 78%, transparent); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid var(--line); }
+  .bar-in { max-width: 1440px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+  .brand .logo { width: 28px; height: 28px; flex: none; filter: drop-shadow(0 4px 10px color-mix(in srgb, var(--accent) 35%, transparent)); }
+  .brand .bname { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand .bname small { font-size: 10.5px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+  @media (max-width: 760px) { .brand .bname small { display: none; } }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--chip); }
+  .key { width: 10px; height: 3px; border-radius: 2px; background: var(--c); flex: none; }
+  .bar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--faint); flex: none; }
+  .dot.on { background: var(--good); animation: pulse 2s infinite; }
+  .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 55%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: .02em; }
+  .badge.real { background: var(--good-bg); color: var(--good); box-shadow: 0 0 0 1px color-mix(in srgb, var(--good) 25%, transparent); }
+  .badge.dry { background: var(--warn-bg); color: var(--warn); }
+
+  main { max-width: 1440px; margin: 0 auto; padding: 18px 20px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  main > * { min-width: 0; }
+  .panel { background: linear-gradient(180deg, var(--panel-hi), var(--panel) 140px); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: inset 0 1px 0 var(--edge), var(--shadow); min-width: 0; }
+  .ph { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .ph h2 { margin: 0; font-size: 13px; font-weight: 650; }
+  .ph .sub { color: var(--muted); font-size: 12px; }
+  .ph .right { margin-left: auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pb { padding: 16px 18px; }
+
+  /* ---------- KPI row ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 560px) { .kpis { grid-template-columns: minmax(0, 1fr); } }
+  .tile { padding: 16px 18px; display: grid; gap: 6px; align-content: start; }
+  .tile .lbl { font-size: 12px; color: var(--muted); font-weight: 550; }
+  .tile .val { font-size: 22px; font-weight: 680; letter-spacing: -.015em; line-height: 1.2; }
+  .tile .note { font-size: 12px; color: var(--muted); }
+  .tile .note.good { color: var(--good); font-weight: 650; }
+  .tile .note.bad { color: var(--bad); }
+  .tile .lbl { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .link { font: inherit; font-size: 12px; color: var(--info); background: none; border: 0; padding: 0; cursor: pointer; font-weight: 600; }
+  .appt { border: 1px solid color-mix(in srgb, var(--info) 40%, var(--line)); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; background: linear-gradient(180deg, color-mix(in srgb, var(--info) 9%, var(--panel-hi)), var(--panel)); }
+  .appt .val { font-size: 20px; }
+  .appt .val { color: var(--text); }
+  .appt-edit { display: grid; gap: 6px; }
+  .appt-edit input, .appt-edit select { font: inherit; font-size: 13px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 7px; background: var(--sunk); color: var(--text); min-width: 0; width: 100%; }
+  .appt-edit .row { display: flex; gap: 6px; }
+  .appt-edit .row > * { flex: 1; }
+  .btn-mini { white-space: nowrap; font: inherit; font-size: 12px; font-weight: 650; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; }
+  .btn-mini.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .vs { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 5px; white-space: nowrap; }
+  .vs.e { color: var(--info); background: color-mix(in srgb, var(--info) 14%, transparent); }
+  .vs.l { color: var(--muted); background: var(--sunk); }
+  .warnbox { font-size: 12px; color: var(--warn); background: var(--warn-bg); border-radius: 8px; padding: 8px 10px; font-weight: 600; }
+  .status { display: grid; grid-template-columns: 1fr auto; gap: 4px 18px; align-items: center;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--panel-hi)), var(--panel) 65%);
+    box-shadow: inset 0 1px 0 var(--edge), var(--glow), var(--shadow); }
+  .status .head { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -.015em; }
+  .status .head .dot { width: 11px; height: 11px; }
+  .status .head, .status .sub { grid-column: 1; }
+  .status .sub { color: var(--muted); font-size: 13px; }
+  .count { text-align: right; grid-row: 1 / 3; grid-column: 2; }
+  .count .t { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 30%, transparent)); }
+  .count .l { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .prog { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--grid); overflow: hidden; margin-top: 10px; }
+  .prog > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1s linear; }
+  .prog.warn > div { background: var(--warn); } .prog.bad > div { background: var(--bad); }
+  /* the city tiles sit inside the status card, under the progress bar */
+  .cyc { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; }
+  .cyc[hidden] { display: none; }
+  .cyc .cc { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 11px 14px 12px; border-radius: 14px;
+    background: color-mix(in srgb, var(--panel) 80%, transparent); border: 1px solid var(--line); transition: border-color .2s, background .2s; }
+  .cyc .cc .nm { font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cyc .cc .row { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 15px; }
+  .cyc .cc { position: relative; }
+  .cyc .cc.closest { border-color: color-mix(in srgb, var(--accent) 60%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent), 0 6px 18px -8px color-mix(in srgb, var(--accent) 55%, transparent); }
+  .cyc .cc.closest.hit, .cyc .cc.closest.better { border-color: var(--good); box-shadow: 0 0 0 1px color-mix(in srgb, var(--good) 35%, transparent), 0 6px 18px -8px color-mix(in srgb, var(--good) 55%, transparent); }
+  .cyc .cc .best { position: absolute; top: -9px; left: 12px; font-size: 10px; font-weight: 800; letter-spacing: .03em; padding: 2px 8px; border-radius: 999px;
+    color: var(--on-accent); background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 40%, transparent); }
+  .cyc .cc.closest.hit .best, .cyc .cc.closest.better .best { background: var(--good); color: #fff; box-shadow: 0 2px 6px color-mix(in srgb, var(--good) 40%, transparent); }
+  .cyc .cc .top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; min-width: 0; }
+  .cyc .cc .cnt { font-size: 11px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; padding: 0 5px; border-radius: 5px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+  .cyc .cc.none .cnt { color: var(--warn); }
+  .cyc .cc .dt { font-size: 19px; font-weight: 750; color: var(--text); white-space: nowrap; min-height: 19px; display: flex; align-items: center; letter-spacing: -.01em; }
+  .cyc .cc .ind { font-size: 11px; font-weight: 700; white-space: nowrap; color: var(--muted); }
+  .cyc .cc .ind:not(:empty) { --c: var(--muted); color: var(--c); padding: 1px 7px; border-radius: 999px; background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 28%, transparent); }
+  .cyc .cc.hit .ind { --c: var(--good); }
+  .cyc .cc.better .ind { --c: var(--good); }
+  .cyc .cc.later .ind { --c: var(--bad); }
+  /* inside your window — bookable: solid green, filled pill */
+  .cyc .cc.hit { border: 2px solid var(--good); background: color-mix(in srgb, var(--good) 15%, var(--panel)); padding: 10px 13px 11px; }
+  .cyc .cc.hit .dt { color: var(--good); }
+  .cyc .cc.hit .ind:not(:empty) { color: #fff; background: var(--good); border-color: var(--good); }
+  /* earlier than your interview: good news, green */
+  .cyc .cc.better { border-color: color-mix(in srgb, var(--good) 50%, transparent); background: color-mix(in srgb, var(--good) 7%, var(--panel)); }
+  .cyc .cc.better .dt, .cyc .cc.better .ind { color: var(--good); }
+  .cyc .cc.none .dt { color: var(--warn); font-size: 12.5px; }
+  .cyc .cc.err .dt { color: var(--bad); font-size: 12.5px; }
+  .cyc .cc.wait .dt { color: var(--faint); }
+  .cyc .cc b { font-size: 13px; font-variant-numeric: tabular-nums; }
+  .cyc .cc .eta { font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cyc .cc.has b { color: var(--good); }
+  .cyc .cc.zero b { color: var(--warn); }
+  .cyc .cc.err b { color: var(--bad); }
+  .cyc .cc.wait { border-style: dashed; }
+  .cyc .cc.wait b { color: var(--faint); }
+  .cyc .cc.now { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
+  .cyc .cc.now .nm, .cyc .cc.now .eta { color: var(--accent); }
+  .spin { width: 12px; height: 12px; flex: none; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    border-top-color: var(--accent); animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2.5s; } }
+  .status .win { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 14px; padding: 9px 14px; border-radius: 12px;
+    background: color-mix(in srgb, var(--accent) 7%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); font-size: 13px; }
+  .status .win .wl { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+  .status .win b { font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .status .win .wd { color: var(--muted); font-size: 12px; }
+  .status .win .wm { margin-left: auto; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+  .status .win .wm.book { color: var(--good); background: var(--good-bg); }
+  .status .win .wm.watch { color: var(--warn); background: var(--warn-bg); }
+  .count .bud { font-size: 11px; color: var(--faint); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .count .bud.warn { color: var(--warn); font-weight: 600; }
+  .meter { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; }
+  .meter > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 3px; }
+  .meter.warn > div { background: var(--warn); }
+
+  .booked { padding: 16px 18px; background: var(--good-bg); border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+  .booked .t { font-size: 17px; font-weight: 700; color: var(--good); }
+
+  /* ---------- Main grid ---------- */
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: stretch; }
+  .grid > .panel { display: flex; flex-direction: column; min-width: 0; }
+  /* the table fills whatever height the right column needs, and scrolls inside */
+  .grid > .panel > .tw { flex: 1 1 auto; min-height: 560px; max-height: none; contain: size; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  aside { display: grid; gap: 16px; min-width: 0; }
+
+  /* Segmented filters */
+  .seg { display: inline-flex; background: var(--sunk); border: 1px solid var(--line); border-radius: 9px; padding: 2px; gap: 2px; }
+  .seg button { font: inherit; font-size: 12px; font-weight: 600; color: var(--muted); background: transparent; border: 0; padding: 4px 10px; border-radius: 7px; cursor: pointer; }
+  .seg button.on { background: var(--panel); color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,.10); }
+
+  /* ---------- Checks table ---------- */
+  .tw { max-height: 560px; overflow: auto; }
+  table.act { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .act th { position: sticky; top: 0; z-index: 1; background: var(--panel-hi); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .act th .key { display: inline-block; vertical-align: middle; margin-right: 6px; }
+  .act td { padding: 8px 10px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  .act th:first-child, .act td:first-child { padding-left: 14px; }
+  /* only the hovered row's own cells (not a nested table inside an expanded check) */
+  .act > tbody > tr:hover > td { background: var(--hover); }
+  .act > tbody > tr.ck-detail:hover > td, .act > tbody > tr.rq-detail:hover > td { background: var(--sunk); }
+  .act .tm { font-weight: 600; }
+  .act .c .d { font-weight: 550; }
+  .act .c .n { color: var(--muted); font-size: 12px; margin-left: 4px; }
+  /* when space is tight, the count and the ↑/↓ chip drop under the date instead of widening the table */
+  .act td.c { white-space: normal; }
+  .act td.c .d, .act td.c .n, .act td.c .arr { white-space: nowrap; display: inline-block; }
+  .act .c.none { color: var(--faint); }
+  /* a date in your window: a green pill on the date, not a filled cell */
+  .act .c.hit .d { color: var(--good); font-weight: 750; background: color-mix(in srgb, var(--good) 14%, transparent); padding: 2px 7px; border-radius: 6px; }
+  .act .c.drop { color: var(--warn); font-weight: 650; }
+  .act .c.better .d { color: var(--good); font-weight: 700; }
+  .act th.appt-col { color: var(--info); }
+  .act .arr { font-weight: 700; font-size: 11px; margin-left: 5px; padding: 1px 5px; border-radius: 5px; }
+  .act .arr.up { color: var(--good); background: var(--good-bg); }
+  .act .arr.dn { color: var(--bad); background: var(--bad-bg); }
+  .act .dim { color: var(--muted); }
+  .act tr.day td { background: var(--sunk) !important; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 7px 14px; }
+  .act tr.ev td { color: var(--text-2); }
+  .act tr.rq-gap td { color: var(--faint); font-size: 12px; padding-top: 5px; padding-bottom: 5px; }
+  .act .rq-m { display: inline-block; min-width: 38px; font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--muted); }
+  .act .rq-ok { color: var(--good); font-weight: 650; }
+  .act .rq-bad { color: var(--bad); font-weight: 650; }
+  .act .rq-slow { color: var(--warn); }
+  .act .rq-redir { color: var(--info); font-weight: 650; }
+  .act tr.rq-row, .act tr.ck-row { cursor: pointer; }
+  .act tr.inprog > td:not(.hit) { background: color-mix(in srgb, var(--accent) 6%, var(--panel)) !important; }
+  .act tr.inprog > td { border-bottom-color: color-mix(in srgb, var(--accent) 25%, var(--grid)); }
+  .act tr.inprog > td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  .act .lv-pill { display: inline-flex; align-items: center; gap: 7px; padding: 3px 10px 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); }
+  .act .lv-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: lvpulse 1.4s ease-in-out infinite; }
+  @keyframes lvpulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); } 50% { box-shadow: 0 0 0 5px transparent; } }
+  .act .lv-ask { color: var(--accent); font-size: 12px; font-weight: 600; }
+  .act .lv-ask .spin { margin-right: 7px; }
+  .act .skel { display: inline-block; width: 64px; height: 9px; border-radius: 5px; vertical-align: middle;
+    background: linear-gradient(90deg, var(--grid) 0%, color-mix(in srgb, var(--text) 10%, var(--grid)) 50%, var(--grid) 100%); background-size: 200% 100%; animation: skel 1.4s ease-in-out infinite; }
+  @keyframes skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+  .act .lv-prog { display: inline-block; width: 38px; height: 5px; border-radius: 3px; background: var(--grid); overflow: hidden; vertical-align: middle; margin-right: 7px; }
+  .act .lv-prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .4s; }
+  .act .lv-n { font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .act .skel, .act .lv-dot { animation: none; } }
+  .act .spin.sm { width: 10px; height: 10px; border-width: 2px; display: inline-block; vertical-align: -1px; }
+  .act tr.ck-row .caret { display: inline-block; width: 12px; color: var(--faint); transition: transform .15s; }
+  .act tr.ck-row.open .caret { transform: rotate(90deg); color: var(--accent); }
+  .act tr.ck-row.open > td { background: var(--hover); }
+  .act tr.ck-detail > td { background: var(--sunk) !important; padding: 10px 14px 14px 30px; white-space: normal; }
+  .act .ck-head, .act .ck-note { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .act .ck-note { font-style: italic; margin: 0; }
+  table.act.sub { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); font-size: 12.5px; }
+  table.act.sub th { position: static; background: var(--panel-hi); }
+  table.act.sub td { padding: 6px 12px; }
+  table.act.sub tr.rq-detail > td { padding: 10px 12px 12px 30px; }
+  .act tr.rq-row .caret { display: inline-block; width: 12px; color: var(--faint); transition: transform .15s; }
+  .act tr.rq-row.open .caret { transform: rotate(90deg); color: var(--accent); }
+  .act tr.rq-row.open td { background: var(--hover); }
+  .act tr.rq-detail > td { background: var(--sunk) !important; white-space: normal; padding: 12px 14px 14px 34px; }
+  .rqd { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: 12.5px; }
+  .rqd dt { color: var(--muted); }
+  .rqd dd { margin: 0; color: var(--text-2); min-width: 0; overflow-wrap: anywhere; }
+  .rqd code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+  .rqd .dchip.better { color: var(--info); border-color: var(--info); font-weight: 650; }
+  .rqd .dchip { font-size: 11.5px; padding: 1px 6px; border-radius: 5px; background: var(--panel); border: 1px solid var(--line); }
+  .rqd .cals { display: grid; grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 10px; max-width: 980px; margin-top: 4px; }
+  .rqd .cal { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 9px 10px 10px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .rqd .cal .ch { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 12px; }
+  .rqd .cal .ch b { color: var(--text); }
+  .rqd .cal .ch span { color: var(--muted); font-size: 11px; font-weight: 600; }
+  .rqd .cg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+  .rqd .cg .wd { font-size: 9.5px; font-weight: 700; color: var(--faint); padding-bottom: 3px; }
+  .rqd .cg .cd { font-size: 11px; line-height: 22px; height: 22px; border-radius: 6px; color: var(--faint); font-variant-numeric: tabular-nums; opacity: .7; }
+  .rqd .cg .cd.av { --c: var(--accent); opacity: 1; font-weight: 700; color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); cursor: default; }
+  .rqd .cg .cd.av.hit { --c: var(--good); background: color-mix(in srgb, var(--c) 24%, transparent); }
+  .rqd .cg .cd.av.better { --c: var(--info); background: color-mix(in srgb, var(--c) 22%, transparent); }
+  .rqd .cg .cd.first { box-shadow: inset 0 0 0 1.5px var(--c); }
+  .rqd .cg .cd.av:hover { background: var(--c); color: var(--panel); }
+  .rqd .cal-key { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--muted); }
+  .rqd .cal-key span { display: inline-flex; align-items: center; gap: 5px; }
+  .rqd .cal-key .k { width: 11px; height: 11px; border-radius: 3px; --c: var(--accent); background: color-mix(in srgb, var(--c) 22%, transparent); }
+  .rqd .cal-key .k.hit { --c: var(--good); } .rqd .cal-key .k.better { --c: var(--info); }
+  .rqd .cal-key .k.first { background: transparent; box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .rqd .note { color: var(--muted); font-style: italic; }
+  .rqd .good { color: var(--good); }
+  .rqd dd b { font-variant-numeric: tabular-nums; }
+  .act tr.ev .evt { display: inline-flex; align-items: center; gap: 8px; }
+  .act tr.ev .evi { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+  .act tr.ev.info .evi { background: var(--info); } .act tr.ev.warn .evi { background: var(--warn); }
+  .act tr.ev.bad .evi { background: var(--bad); } .act tr.ev.bad .evt { color: var(--bad); font-weight: 600; }
+  .act tr.ev.good td { background: color-mix(in srgb, var(--good) 5%, transparent); } .act tr.ev.good .evi { background: var(--good); } .act tr.ev.good .evt { color: var(--good); font-weight: 650; }
+  .act tr.ev .evic.ic-booked, .act tr.ev .evic.ic-found { --c: var(--good); }
+  .act tr.ev .evic.ic-booked { color: #fff; background: var(--good); border-color: var(--good); box-shadow: 0 2px 6px color-mix(in srgb, var(--good) 35%, transparent); }
+  .act tr.ev .evic.ic-booked svg { stroke-width: 2.4; }
+  .act tr.ev .x { color: var(--muted); font-size: 12px; }
+  /* session events: a tinted icon badge instead of the dot */
+  .act tr.ev .evic { --c: var(--session); display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; flex: none;
+    color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); }
+  .act tr.ev .evic svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .act tr.ev .evic.ic-stop { --c: var(--muted); }
+  .act tr.ev.bad .evic { --c: var(--bad); }
+  .act tr.ev.session td { background: color-mix(in srgb, var(--session) 4%, transparent); }
+  .act tr.ev.session .evt { color: var(--text-2); font-weight: 550; }
+  .act tr.newest td:first-child { box-shadow: inset 3px 0 0 var(--good); }
+  .tf { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+  .btn-ghost { font: inherit; font-size: 12px; font-weight: 600; color: var(--text); background: var(--sunk); border: 1px solid var(--line); border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+
+  /* ---------- Controls ---------- */
+  form { display: grid; gap: 14px; }
+  .fl { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; }
+  .range { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; }
+  .range span { color: var(--muted); font-size: 12px; }
+  input[type=date] { font: inherit; font-size: 13px; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--field); color: var(--text); min-width: 0; transition: background .15s, border-color .15s; }
+  input[type=date]:hover:not(:disabled) { background: var(--field-hover); }
+  input[type=date]::-webkit-calendar-picker-indicator { opacity: .55; cursor: pointer; }
+  input[type=date]:focus { outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent); border-color: var(--accent); }
+  input:disabled { opacity: .65; }
+  .mode { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--field); border: 1px solid var(--line); border-radius: 11px; padding: 4px; }
+  .mode input { position: absolute; opacity: 0; pointer-events: none; }
+  .mode label { text-align: center; padding: 7px 4px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 650; color: var(--muted); border: 1px solid transparent; transition: background .15s, color .15s, border-color .15s; }
+  .mode label:hover { color: var(--text-2); }
+  .mode label small { display: block; font-weight: 400; font-size: 11px; }
+  .mode input:checked + label { background: color-mix(in srgb, var(--accent) 16%, var(--panel)); color: var(--text); border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 2px 10px -2px color-mix(in srgb, var(--accent) 35%, transparent); }
+  .mode input:checked + label small { color: var(--accent); }
+  #mWatch:checked + label { background: color-mix(in srgb, var(--warn) 14%, var(--panel)); border-color: color-mix(in srgb, var(--warn) 55%, transparent); box-shadow: none; }
+  #mWatch:checked + label small { color: var(--warn); }
+  .summary { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .summary b { color: var(--text); font-weight: 600; }
+  .btn { font: inherit; font-weight: 700; font-size: 14px; padding: 10px 14px; border-radius: 10px; border: 0; cursor: pointer; color: #fff; width: 100%; transition: filter .15s, transform .05s; }
+  .btn:hover { filter: brightness(1.06); } .btn:active { transform: translateY(1px); }
+  .btn.start { background: linear-gradient(135deg, var(--go-1), var(--go-2)); color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, .15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 6px 18px -4px color-mix(in srgb, var(--go-1) 45%, transparent); }
+  .btn.stop { background: var(--bad-solid); color: var(--on-bad); box-shadow: 0 4px 14px color-mix(in srgb, var(--bad-solid) 28%, transparent); }
+  .btn.sm { width: auto; padding: 6px 14px; font-size: 13px; }
+  .msg { color: var(--bad); font-size: 12px; }
+  .msg:empty { display: none; }
+
+  /* ---------- Cities now ---------- */
+  .cities { display: grid; }
+  .crow { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 11px 18px; border-bottom: 1px solid var(--grid); }
+  .crow:last-child { border-bottom: 0; }
+  .crow .nm { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .crow .dt { text-align: right; font-weight: 650; }
+  .crow .dt.none { color: var(--faint); font-weight: 500; }
+  .crow .ds { grid-column: 1 / -1; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+  .crow .ds .good { color: var(--good); font-weight: 650; }
+  .crow .ds .up { color: var(--good); } .crow .ds .dn { color: var(--bad); }
+  .crow.hit { background: var(--good-bg); }
+
+  /* ---------- Chart ---------- */
+  .chart-wrap { position: relative; padding: 8px 8px 4px; }
+  svg.chart { display: block; width: 100%; overflow: visible; }
+  .chart text { font-size: 11px; fill: var(--muted); font-family: inherit; }
+  .chart .gl { stroke: var(--grid); stroke-width: 1; }
+  .chart .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .lbl { font-size: 12px; font-weight: 650; fill: var(--text-2); }
+  .chart .xh { stroke: var(--text); stroke-opacity: .35; stroke-width: 1; }
+  .chart .pt { stroke: var(--panel); stroke-width: 2; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .key { width: 14px; height: 2px; }
+  .tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px;
+    box-shadow: var(--shadow-lg); font-size: 12px; min-width: 190px; z-index: 5; }
+  .tip .tt { color: var(--muted); margin-bottom: 6px; }
+  .tip .tr { display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; align-items: center; padding: 2px 0; }
+  .tip .tr b { font-weight: 700; color: var(--text); }
+  .tip .tr span { color: var(--muted); }
+  .chart-note { padding: 0 18px 14px; font-size: 12px; color: var(--muted); }
+
+  .icon-btn { font: inherit; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-2); background: var(--chip); border: 1px solid var(--line); border-radius: 9px; padding: 5px 11px; cursor: pointer; transition: background .15s, border-color .15s; }
+  .icon-btn:hover { background: var(--hover); }
+  .ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .tools { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 10px; background: var(--chip); }
+  .tool { position: relative; display: grid; place-items: center; width: 32px; height: 28px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
+  .tool:hover { background: var(--hover); color: var(--text); }
+  .tool.quit:hover { color: var(--bad); background: var(--bad-bg); }
+  .tool.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
+  .tool:focus-visible, .icon-btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 1px; }
+  /* tooltip */
+  .tool::after { content: attr(data-tip); position: absolute; top: calc(100% + 8px); right: 0; white-space: nowrap; font-size: 12px; font-weight: 550;
+    background: var(--text); color: var(--bg); padding: 5px 8px; border-radius: 7px; opacity: 0; pointer-events: none; transform: translateY(-3px); transition: opacity .12s, transform .12s; z-index: 20; }
+  .tool:hover::after, .tool:focus-visible::after { opacity: 1; transform: none; }
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.32); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 30;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  /* Slides in from the right; visibility flips after the slide-out so it can animate */
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: var(--panel); border-left: 1px solid var(--line); z-index: 31;
+    display: grid; grid-template-rows: auto 1fr auto; box-shadow: var(--shadow-lg); padding-top: env(safe-area-inset-top, 0px);
+    transform: translateX(104%); visibility: hidden;
+    transition: transform .3s cubic-bezier(.32, .72, 0, 1), visibility 0s linear .3s; }
+  .drawer:focus { outline: none; }
+  .drawer.open { transform: none; visibility: visible; transition: transform .38s cubic-bezier(.32, .72, 0, 1), visibility 0s; }
+  .drawer .db > * { transition: opacity .3s ease .08s, transform .35s cubic-bezier(.32, .72, 0, 1) .08s; }
+  .drawer:not(.open) .db > * { opacity: 0; transform: translateX(12px); transition: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .scrim, .drawer, .drawer.open, .drawer .db > * { transition: none !important; }
+  }
+  .drawer .dh { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+  .drawer .dh h2 { margin: 0; font-size: 15px; }
+  .drawer .dh .esc { margin-left: auto; font-size: 12px; color: var(--muted); }
+  .drawer .dh kbd { font: 600 11px ui-monospace, Menlo, monospace; padding: 2px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--field); color: var(--text-2); }
+  .drawer .db { overflow: auto; padding: 18px 20px; display: grid; gap: 22px; align-content: start; }
+  .drawer .df { padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); display: grid; gap: 8px; }
+  .set h3 { margin: 0 0 4px; font-size: 13px; }
+  .set p { margin: 0 0 10px; font-size: 12px; color: var(--muted); }
+  .set .env { font: 11px ui-monospace, Menlo, monospace; color: var(--faint); }
+  .citygrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .citygrid label { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; cursor: pointer; font-size: 13px; background: var(--sunk); }
+  .citygrid label:has(input:checked) { border-color: color-mix(in srgb, var(--good) 50%, var(--line)); background: var(--good-bg); font-weight: 600; }
+  .set .two-in { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+  .set input[type=number], .set input[type=text] { font: inherit; font-size: 13px; width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunk); color: var(--text); min-width: 0; }
+  .set .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .set .hint b { color: var(--text); }
+  .set .row { display: flex; gap: 8px; }
+  .okmsg { color: var(--good); font-size: 12px; font-weight: 600; }
+  .sw { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--field); cursor: pointer; margin-bottom: 8px; }
+  .sw b { display: block; font-size: 13px; font-weight: 600; }
+  .sw small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .sw input { position: absolute; opacity: 0; pointer-events: none; }
+  .sw i { position: relative; flex: none; width: 38px; height: 22px; border-radius: 999px; background: var(--line); transition: background .18s; }
+  .sw i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .18s; }
+  .sw input:checked + i { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  .sw input:checked + i::after { transform: translateX(16px); }
+  .sw input:focus-visible + i { outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 2px; }
+
+  .act tr.ev.early td { background: color-mix(in srgb, var(--good) 6%, var(--panel)); } .act tr.ev.early .evi { background: var(--good); } .act tr.ev.early .evt { color: var(--good); font-weight: 600; }
+  a.btn-ghost { text-decoration: none; display: inline-block; }
+  .icon-btn.on { color: var(--good); border-color: color-mix(in srgb, var(--good) 45%, var(--line)); background: var(--good-bg); }
+
+  /* Openings / insights */
+  .ins { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0; }
+  @media (max-width: 1000px) { .ins { grid-template-columns: minmax(0, 1fr); } }
+  .ins > div { padding: 16px 18px; min-width: 0; }
+  .ins > div + div { border-left: 1px solid var(--line); }
+  @media (max-width: 1000px) { .ins > div + div { border-left: 0; border-top: 1px solid var(--line); } }
+  .istats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .istat .v { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .istat .k { font-size: 12px; color: var(--muted); }
+  .ititle { font-size: 12px; font-weight: 650; color: var(--text-2); margin: 0 0 8px; display: flex; justify-content: space-between; gap: 8px; }
+  .ititle span { font-weight: 400; color: var(--muted); }
+  .hours { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 3px; align-items: end; height: 90px; }
+  .hours .b { position: relative; height: 100%; display: flex; align-items: flex-end; }
+  .hours .b i { display: block; width: 100%; background: linear-gradient(180deg, var(--accent-2), var(--accent)); border-radius: 3px 3px 0 0; min-height: 0; }
+  .hours .b.zero i { background: transparent; }
+  .cov { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 3px; margin-top: 4px; }
+  .cov i { height: 6px; border-radius: 2px; background: var(--grid); }
+  .cov i.c1 { background: color-mix(in srgb, var(--text) 18%, var(--grid)); } .cov i.c2 { background: color-mix(in srgb, var(--text) 40%, var(--grid)); }
+  .hlabels { display: grid; grid-template-columns: repeat(24, minmax(0, 1fr)); gap: 3px; font-size: 10px; color: var(--faint); margin-top: 4px; }
+  .hlabels span { text-align: center; }
+  .ilegend { display: flex; gap: 14px; font-size: 11px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+  .ilegend i { display: inline-block; width: 10px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 18px; }
+  .days div { text-align: center; font-size: 11px; color: var(--muted); }
+  .days b { display: block; font-size: 15px; color: var(--text); font-weight: 650; }
+  .days .nodata b { color: var(--faint); font-weight: 400; }
+  .insight { font-size: 13px; background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 16px; color: var(--text-2); }
+  .insight b { color: var(--text); }
+  .olist { list-style: none; margin: 0; padding: 0; max-height: 330px; overflow: auto; }
+  /* the openings list takes the left column's height and scrolls inside, so neither side leaves a gap */
+  .ins > div:last-child { display: flex; flex-direction: column; }
+  .ins .olist { flex: 1 1 auto; min-height: 160px; max-height: none; contain: size; }
+  @media (max-width: 1000px) { .ins .olist { contain: none; max-height: 330px; } }
+  .olist li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--grid); font-size: 13px; }
+  .olist li:last-child { border-bottom: 0; }
+  .olist .w { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .olist .d { font-weight: 650; }
+  .olist .m { font-size: 12px; color: var(--muted); white-space: nowrap; text-align: right; }
+  .olist li.beat .d { color: var(--info); }
+  .bestrow { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 5px 0; }
+  .bestrow .nm { display: flex; align-items: center; gap: 8px; }
+
+  .closed { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background-color: var(--bg);
+    background-image: radial-gradient(1100px 520px at -5% -10%, var(--bg-glow-1), transparent 60%), radial-gradient(900px 480px at 105% 0%, var(--bg-glow-2), transparent 60%); }
+  .closed-card { text-align: center; max-width: 440px; display: grid; gap: 10px; }
+  .closed-card h2 { margin: 14px 0 0; font-size: 24px; letter-spacing: -.02em; }
+  .closed-card p { margin: 0; color: var(--text-2); line-height: 1.6; }
+  .closed-card code { font: 12px ui-monospace, Menlo, monospace; background: var(--field); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; }
+
+  details { padding: 12px 18px; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+  pre { margin: 10px 0 0; max-height: 280px; overflow: auto; font: 11.5px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap; word-break: break-word; color: var(--muted); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="logoBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>
+    <symbol id="logo" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="15" fill="url(#logoBg)"/>
+      <g stroke="#c7d2fe" stroke-width="3" stroke-linecap="round" opacity=".85"><path d="M6 31h7"/><path d="M4 38h9"/><path d="M7 45h6"/></g>
+      <rect x="17" y="17" width="38" height="34" rx="7" fill="#fff"/>
+      <path d="M17 24a7 7 0 0 1 7-7h24a7 7 0 0 1 7 7v4H17z" fill="#e0e7ff"/>
+      <rect x="25" y="12" width="5" height="10" rx="2.5" fill="#1e1b4b"/><rect x="42" y="12" width="5" height="10" rx="2.5" fill="#1e1b4b"/>
+      <path d="M27 39.5l5.5 5.5L45 32.5" fill="none" stroke="#4f46e5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand"><svg class="logo" role="img" aria-label="US Visa Bot"><use href="#logo"/></svg><span class="bname">US Visa Bot<small>Early appointment finder</small></span></div>
+    <div class="chips" id="chips"></div>
+    <div class="bar-right">
+      <span class="live"><span class="dot" id="barDot"></span><span id="barState">…</span></span>
+      <span class="badge" id="mode" hidden></span>
+      <div class="tools" role="group" aria-label="Display and sound">
+        <button class="tool" id="themeBtn" type="button"></button>
+        <button class="tool quit" id="quitBtn" type="button" data-tip="Quit dashboard" aria-label="Quit dashboard"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg></button>
+      </div>
+      <button class="icon-btn" id="openSettings" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+      <button class="btn stop sm" id="stopTop" hidden>Stop</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="panel tile status">
+      <div class="head"><span class="dot" id="dot"></span><span id="headline">Loading…</span></div>
+      <div class="sub" id="subline"></div>
+      <div class="count" id="count" hidden><div class="l" id="countLbl">Next check in</div><div class="t num" id="countVal"></div><div class="bud" id="kBudget" title="Requests sent in the last 24 hours — a safety cap so the account isn't flagged"></div></div>
+      <div class="prog" id="prog" hidden><div id="progBar"></div></div>
+      <div class="win" id="winChip" hidden></div>
+      <div class="cyc" id="cyc" hidden></div>
+  </section>
+
+  <section class="panel booked" id="bookedCard" hidden>
+    <div class="t" id="bookedText"></div>
+    <div class="muted">Confirmed on your account page at ais.usvisa-info.com.</div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <div class="ph">
+        <h2>Checks</h2><span class="sub" id="tblSub"></span>
+        <div class="right">
+          <div class="seg" id="tblFilter">
+            <button data-f="all" class="on">All</button>
+            <button data-f="changes">Changes</button>
+            <button data-f="events">Events</button>
+          </div>
+        </div>
+      </div>
+      <div class="tw"><table class="act" id="act"></table></div>
+      <div class="tf"><span id="tblCount"></span><button class="btn-ghost" id="more" hidden>Show more</button></div>
+    </div>
+
+    <aside>
+      <div class="panel">
+        <div class="ph"><h2>Controls</h2></div>
+        <div class="pb">
+          <div class="tile appt">
+            <div class="lbl"><span>Your current interview</span><button class="link" id="apptEditBtn" type="button">Edit</button></div>
+            <div id="apptView">
+              <div class="val num" id="kAppt">–</div>
+              <div class="note" id="kApptNote"></div>
+            </div>
+            <form class="appt-edit" id="apptForm" hidden>
+              <input type="date" id="apptDate" required aria-label="Appointment date">
+              <div class="row"><input type="text" id="apptTime" placeholder="Time (07:40)" aria-label="Time"><select id="apptCity" aria-label="City"></select></div>
+              <div class="row"><button class="btn-mini primary" type="submit">Save</button><button class="btn-mini" type="button" id="apptCancel">Cancel</button></div>
+              <button class="link" type="button" id="apptReset" style="justify-self:start">Use bot's last booking</button>
+            </form>
+          </div>
+          <form id="ctl">
+            <div>
+              <div class="fl">Book an appointment between</div>
+              <div class="range">
+                <input type="date" id="from" required aria-label="From">
+                <span>and</span>
+                <input type="date" id="to" required aria-label="To">
+              </div>
+            </div>
+            <div>
+              <div class="fl">When a date opens up</div>
+              <div class="mode">
+                <input type="radio" name="mode" id="mBook" checked><label for="mBook">Book it<small>automatically</small></label>
+                <input type="radio" name="mode" id="mWatch"><label for="mWatch">Just watch<small>no booking</small></label>
+              </div>
+            </div>
+            <div class="summary" id="summary"></div>
+            <div class="warnbox" id="winWarn" hidden></div>
+            <button class="btn start" id="startBtn" type="submit">Start</button>
+            <button class="btn stop" id="stopBtn" type="button" hidden>Stop bot</button>
+            <div class="msg" id="msg"></div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><h2>Cities now</h2><span class="sub" id="citiesSub"></span></div>
+        <div class="cities" id="cities"></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="panel">
+    <div class="ph">
+      <h2>Earliest open date over time</h2>
+      <span class="sub">lower is earlier</span>
+      <div class="right">
+        <div class="legend" id="legend"></div>
+        <div class="seg" id="chartRange">
+          <button data-r="6">6h</button>
+          <button data-r="24" class="on">24h</button>
+          <button data-r="0">All</button>
+        </div>
+      </div>
+    </div>
+    <div class="chart-wrap" id="chartWrap">
+      <svg class="chart" id="chart" role="img" aria-label="Earliest open date per city over time"></svg>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <div class="chart-note" id="chartNote"></div>
+  </section>
+
+  <section class="panel">
+    <div class="ph">
+      <h2>When openings appear</h2>
+      <span class="sub" id="insSub"></span>
+      <div class="right"><span class="sub">An opening = a city's earliest date moved earlier (someone cancelled)</span></div>
+    </div>
+    <div class="ins">
+      <div>
+        <div class="istats" id="istats"></div>
+        <div class="ititle">Openings by hour of day <span>your local time</span></div>
+        <div class="hours" id="hours"></div>
+        <div class="cov" id="cov"></div>
+        <div class="hlabels" id="hlabels"></div>
+        <div class="ilegend"><span><i style="background:var(--accent)"></i>openings found</span><span><i style="background:color-mix(in srgb, var(--text) 40%, var(--grid))"></i>hours the bot was checking</span><span><i style="background:var(--grid)"></i>not checked — no data</span></div>
+        <div class="days" id="days"></div>
+        <div class="insight" id="insight"></div>
+      </div>
+      <div>
+        <div class="ititle">Earliest date ever seen <span>last 30 days</span></div>
+        <div id="best" style="margin-bottom:16px"></div>
+        <div class="ititle">Recent openings <span>how long each lasted</span></div>
+        <ul class="olist" id="olist"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <details id="logBox"><summary>Raw log <span class="muted" style="font-weight:400">· last 300 lines, newest at the bottom</span></summary><pre id="log"></pre></details>
+  </section>
+</main>
+
+<div class="closed" id="closedScreen" hidden>
+  <div class="closed-card">
+    <div class="brand" style="justify-content:center"><svg class="logo" role="img" aria-label="US Visa Bot"><use href="#logo"/></svg><span class="bname">US Visa Bot<small>Early appointment finder</small></span></div>
+    <h2>Dashboard closed</h2>
+    <p id="closedMsg"></p>
+    <p class="muted">To open it again, double-click <b>Visa Bot.cmd</b> (Windows) or <b>Visa Bot.command</b> (macOS) in the project folder<br>(or run <code>npm run ui</code>).</p>
+  </div>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Settings" tabindex="-1" inert>
+  <div class="dh"><h2>Settings</h2><span class="esc"><kbd>Esc</kbd> to close</span></div>
+  <form class="db" id="setForm">
+    <div class="set">
+      <h3>Sound &amp; alerts</h3>
+      <p>Saved in this browser and applied right away — they only work while the dashboard is open.</p>
+      <label class="sw">
+        <span><b>Sound on each check</b><small>A short ding every time the bot finishes a check.</small></span>
+        <input type="checkbox" id="prefTick"><i></i>
+      </label>
+      <label class="sw">
+        <span><b>Alert when a date is found or booked</b><small>Chime + desktop notification for bookings, matches and dates earlier than your appointment.</small></span>
+        <input type="checkbox" id="prefAlerts"><i></i>
+      </label>
+      <div class="hint" id="prefHint"></div>
+    </div>
+    <div class="set">
+      <h3>Startup</h3>
+      <p>Applied right away.</p>
+      <label class="sw">
+        <span><b>Start the dashboard when I log in</b><small>Opens in the background each time you log in to this computer. The bot still only starts when you press Start.</small></span>
+        <input type="checkbox" id="prefAutostart"><i></i>
+      </label>
+      <div class="hint" id="autostartHint"></div>
+    </div>
+    <div class="set">
+      <h3>Cities to check</h3>
+      <p>Each city is one request per check — fewer cities means less chance of a ban. <span class="env">FACILITY_ID</span></p>
+      <div class="citygrid" id="setCities"></div>
+    </div>
+    <div class="set">
+      <h3>Time between checks</h3>
+      <p>A random wait in this range, in seconds. The bot never goes below 60s. <span class="env">REFRESH_DELAY</span></p>
+      <div class="two-in"><input type="number" id="setMin" min="60" max="3600" step="10" aria-label="Minimum seconds"><span class="muted">to</span><input type="number" id="setMax" min="60" max="3600" step="10" aria-label="Maximum seconds"></div>
+      <div class="hint" id="setRate"></div>
+    </div>
+    <div class="set">
+      <h3>Daily safety cap</h3>
+      <p>Most requests allowed in any 24 hours. Yesterday's soft ban hit after ~2,000. <span class="env">DAILY_REQUEST_CAP</span></p>
+      <input type="number" id="setCap" min="20" max="3000" step="10" aria-label="Daily cap">
+      <div class="hint" id="setCapHint"></div>
+    </div>
+    <div class="set">
+      <h3>Phone alerts</h3>
+      <p>Your ntfy topic — subscribe to it in the ntfy app. Leave empty to turn alerts off. <span class="env">NTFY_TOPIC</span></p>
+      <div class="row"><input type="text" id="setTopic" autocomplete="off" spellcheck="false" aria-label="ntfy topic"><button class="btn-mini" type="button" id="testNotify">Send test</button></div>
+      <div class="hint" id="notifyMsg"></div>
+    </div>
+  </form>
+  <div class="df">
+    <div class="msg" id="setMsg"></div>
+    <button class="btn start" type="submit" form="setForm">Save to .env</button>
+  </div>
+</aside>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let S = null, formSynced = false, showCount = 40, tblFilter = 'all', chartHours = 24;
+
+// ---------- date helpers (plain YYYY-MM-DD, UTC math so time zones can't shift a day)
+const day = iso => Date.parse(iso + 'T00:00:00Z');
+const addDays = (iso, n) => new Date(day(iso) + n * 86400000).toISOString().slice(0, 10);
+const daysBetween = (a, b) => Math.round((day(a) - day(b)) / 86400000);
+const fmtDate = (iso, o = { month: 'short', day: 'numeric', year: 'numeric' }) => new Date(day(iso)).toLocaleDateString(undefined, { ...o, timeZone: 'UTC' });
+const clock = iso => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const dayKey = iso => new Date(iso).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+function ago(iso) {
+  const s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + ' min ago';
+  if (s < 86400) return Math.floor(s / 3600) + ' h ago';
+  return new Date(iso).toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+function dur(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}:${String(sec).padStart(2, '0')}`;
+}
+
+// The bot takes an exclusive "before" date (-c); the UI speaks in an inclusive "to" date
+const winFrom = () => S?.min || null;
+const winTo = () => S?.current ? addDays(S.current, -1) : null;
+const inWindow = d => d && S?.current && d < S.current && (!S.min || d >= S.min);
+// Comparison with the appointment you hold now (negative = earlier than yours)
+const appt = () => S?.appointment || null;
+const vsAppt = d => (d && appt() ? daysBetween(d, appt().date) : null);
+const vsTag = d => {
+  const v = vsAppt(d);
+  if (v === null || v === 0) return v === 0 ? '<span class="vs l">same as yours</span>' : '';
+  return v < 0 ? `<span class="vs e">${-v}d earlier than yours</span>` : `<span class="vs l">${v}d later than yours</span>`;
+};
+
+// Cities in fixed order from .env; colour follows the city, never its rank
+function cityList() {
+  let names = (S.watching || []).map(c => c.name);
+  if (!names.length) for (const ch of S.checkLog) for (const c of ch.cities) if (!names.includes(c.name)) names.push(c.name);
+  return names;
+}
+// Each city keeps one colour for good: slot comes from its place in the country's full list
+const COLOR_ORDER = ['Calgary', 'Ottawa', 'Toronto', 'Vancouver', 'Montreal', 'Quebec City', 'Halifax'];
+const colorOf = name => {
+  const all = [...COLOR_ORDER, ...(S?.allCities || []).map(c => c.name).filter(n => !COLOR_ORDER.includes(n))];
+  const i = all.indexOf(name);
+  return `var(--s${(i < 0 ? 7 : i % 8) + 1})`;
+};
+
+const PHASES = {
+  stopped:      { dot: '',     bar: 'Stopped',      head: 'Stopped',                       sub: 'Pick your dates and press Start.' },
+  'signing-in': { dot: 'on',   bar: 'Signing in',   head: 'Signing in…',                   sub: 'Connecting to the visa site.' },
+  checking:     { dot: 'on',   bar: 'Checking',     head: 'Checking cities…',              sub: 'Querying each city for availability.' },
+  waiting:      { dot: 'on',   bar: 'Watching',     head: 'Watching for openings',         sub: 'Nothing in your window yet.', label: 'Next check in' },
+  relogin:      { dot: 'warn', bar: 'Reconnecting', head: 'Reconnecting',                  sub: 'Session ended — signing in again automatically.', label: 'Signing in again in', p: 'warn' },
+  paused:       { dot: 'bad',  bar: 'Paused',       head: 'Paused — site pushed back',     sub: 'Resting to avoid a ban.', label: 'Next check in', p: 'bad' },
+  budget:       { dot: 'warn', bar: 'Daily limit',  head: 'Daily limit reached',           sub: 'Waiting for older checks to age out.', label: 'Next check in', p: 'warn' },
+};
+
+// ---------- header + KPI tiles (re-rendered every second for the countdown)
+function renderTop() {
+  const p = PHASES[S.phase] || PHASES.checking;
+  const running = !!S.pid;
+  $('barDot').className = $('dot').className = 'dot ' + p.dot;
+  $('barState').textContent = p.bar;
+  $('headline').textContent = p.head;
+  $('subline').textContent = p.sub;
+  $('mode').hidden = !running;
+  $('mode').textContent = S.dryRun ? 'JUST WATCHING' : 'AUTO-BOOKING';
+  $('mode').className = 'badge ' + (S.dryRun ? 'dry' : 'real');
+  $('stopTop').hidden = !running;
+
+  const remaining = S.until ? Date.parse(S.until) - Date.now() : null;
+  const counting = !!(running && remaining !== null && p.label);
+  $('count').hidden = $('prog').hidden = !counting;
+  if (counting) {
+    $('countLbl').textContent = p.label;
+    $('countVal').textContent = remaining > 0 ? dur(remaining) : 'now';
+    const total = Date.parse(S.until) - Date.parse(S.since);
+    $('prog').className = 'prog ' + (p.p || '');
+    $('progBar').style.width = (total > 0 ? Math.min(100, Math.max(0, 100 * (1 - remaining / total))) : 100) + '%';
+  }
+  renderCycle(running, counting);
+  if (running && S.startedAt && !counting) $('subline').textContent += ` · running ${dur(Date.now() - Date.parse(S.startedAt))}`;
+  else if (running && S.startedAt) $('subline').textContent = `${bookedThisRun() ? `Booked ${fmtDate(bookedThisRun())} — now only earlier dates count.` : p.sub} Running ${dur(Date.now() - Date.parse(S.startedAt))} · ${S.checksThisRun} checks.`;
+}
+
+// City tiles in the status card: open dates per city, a spinner on the city
+// being asked, and a countdown to when each city gets checked. Cities after the
+// next one are estimates (~), since the pause between cities is random.
+const CITY_GAP_EST = 9000; // average random pause between cities (5-12 s) plus the request
+
+const shortDate = iso => {
+  const d = new Date(iso + 'T00:00:00Z');
+  return `${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' })} '${String(d.getUTCFullYear()).slice(2)}`;
+};
+
+function renderCycle(running, counting) {
+  const box = $('cyc'), names = cityList();
+  box.hidden = !running || !names.length;
+  if (box.hidden) return;
+  const reqs = S.requests || [];
+  const current = [];
+  for (let i = reqs.length - 1; i >= 0 && reqs[i].kind !== 'rest'; i--) {
+    if (reqs[i].kind === 'req' && /^dates /.test(reqs[i].what)) current.unshift(reqs[i]);
+  }
+  const now = Date.now();
+  const checking = S.phase === 'checking' && current.length < names.length;
+  // The bot shuffles the cities every check and logs the order (and the next one) in advance
+  const restIdx = reqs.map(r => r.kind).lastIndexOf('rest');
+  const planned = checking ? reqs.slice(restIdx + 1).reverse().find(r => r.kind === 'order')
+    : [...reqs].reverse().find(r => r.kind === 'next-order');
+  const inOrder = (planned?.cities || []).filter(n => names.includes(n));
+  const order = [...inOrder, ...names.filter(n => !inOrder.includes(n))];
+  const eta = (t, exact) => (t - now < 1000 ? '' : (exact ? '' : '~') + dur(t - now));
+  let tiles;
+  if (checking) {
+    const byName = Object.fromEntries(current.map(r => [r.what.replace(/^dates /, '').replace(/\(\d+\)$/, ''), r]));
+    // When the next city gets asked: the end of the pause in progress, or now if its request is in flight
+    const last = reqs[reqs.length - 1];
+    const nextAt = last?.kind === 'pause' ? Date.parse(last.at) + last.secs * 1000 : now;
+    let k = -1;
+    tiles = order.map(n => {
+      const r = byName[n];
+      if (r) {
+        if (r.error || (r.got || '').startsWith('error')) return { n, cls: 'err', v: '!', note: 'error' };
+        const count = parseInt(r.got, 10) || 0;
+        return { n, cls: count ? 'has' : 'zero', v: count, d: (r.got || '').match(/earliest (\S+)/)?.[1] || null, note: 'done' };
+      }
+      k++;
+      if (k === 0) return { n, cls: 'now', spin: true, t: eta(nextAt, true) };
+      return { n, cls: 'wait', v: '–', t: eta(Math.max(nextAt, now) + k * CITY_GAP_EST) };
+    });
+    const done = names.length - k - 1;
+    if (!counting) {
+      $('count').hidden = $('prog').hidden = false;
+      $('countLbl').textContent = 'Cities checked';
+      $('countVal').textContent = `${done}/${names.length}`;
+      $('prog').className = 'prog';
+      $('progBar').style.width = `${(100 * done) / names.length}%`;
+    }
+  } else {
+    const latest = Object.fromEntries((S.latest?.cities || []).map(c => [c.name, c]));
+    const start = S.phase === 'waiting' && S.until ? Date.parse(S.until) : null;
+    tiles = order.map((n, i) => {
+      const c = latest[n];
+      const t = start ? eta(start + i * CITY_GAP_EST, i === 0) : '';
+      return c ? { n, cls: c.count ? 'has' : 'zero', v: c.count, d: c.date, t } : { n, cls: 'wait', v: '–', t };
+    });
+  }
+  box.title = checking ? 'This check, city by city — the countdown is when each city gets asked' : 'Open dates per city in the last check, and when each is checked next';
+  const closest = tiles.filter(c => c.d).sort((a, b) => a.d.localeCompare(b.d))[0];
+  box.innerHTML = tiles.map(c => {
+    const when = c.t ? ` · checked ${c.t.startsWith('~') ? 'in about ' + c.t.slice(1) : 'in ' + c.t}` : '';
+    // The city's earliest open date, and how it compares to your window and appointment
+    let date = '', ind = '', tone = '', what;
+    if (c.spin) { date = '<span class="spin"></span>'; what = 'request in flight'; }
+    else if (c.d) {
+      const v = vsAppt(c.d);
+      date = esc(shortDate(c.d));
+      if (inWindow(c.d)) { tone = 'hit'; ind = '✓ in window'; }
+      else if (v !== null && v < 0) { tone = 'better'; ind = `${-v}d earlier`; }
+      else if (v !== null) { tone = 'later'; ind = `+${v}d later`; }
+      what = `earliest ${fmtDate(c.d)} (${c.v} open)${inWindow(c.d) ? ' — in your window' : v !== null ? ` — ${Math.abs(v)} days ${v < 0 ? 'before' : 'after'} your appointment` : ''}`;
+    } else if (c.cls === 'err') { date = 'Error'; tone = 'err'; what = 'the request failed'; }
+    else if (c.cls === 'wait') { date = '–'; what = 'not checked yet'; }
+    else { date = 'No dates'; tone = 'none'; what = 'no open dates'; }
+    const isClosest = c === closest;
+    return `<span class="cc ${c.cls} ${tone}${isClosest ? ' closest' : ''}" title="${esc(c.n)}: ${esc((isClosest ? 'the earliest date you could book right now · ' : '') + what + when)}">`
+      + (isClosest ? '<span class="best">★ Earliest available</span>' : '')
+      + `<span class="top"><span class="nm">${esc(c.n)}</span>${typeof c.v === 'number' ? `<span class="cnt" title="open dates">${c.v}</span>` : ''}</span>`
+      + `<span class="dt">${date}</span><span class="row"><span class="ind">${esc(ind)}</span><span class="eta">${esc(c.t || '')}</span></span></span>`;
+  }).join('');
+}
+
+function renderKpis() {
+  const a = appt();
+  $('kAppt').textContent = a ? fmtDate(a.date) : 'Not set';
+  if (a) {
+    const away = daysBetween(a.date, new Date().toISOString().slice(0, 10));
+    $('kApptNote').textContent = [a.city, a.time].filter(Boolean).join(' · ') + ` · in ${away} days` + (a.source === 'bot' ? ' · from the bot\'s last booking' : '');
+  } else $('kApptNote').textContent = 'Click Edit to add it';
+
+  const pct = 100 * S.budgetUsed / S.budgetCap;
+  $('kBudget').textContent = `${S.budgetUsed}/${S.budgetCap} requests · 24h`;
+  $('kBudget').className = 'bud' + (pct > 80 ? ' warn' : '');
+
+  // The window the running bot is working on (both dates included) and its mode
+  const chip = $('winChip');
+  chip.hidden = !(S.pid && S.current);
+  if (!chip.hidden) {
+    const from = winFrom(), to = winTo(), year = d => fmtDate(d, { year: 'numeric' });
+    const fmt = d => fmtDate(d, { month: 'short', day: 'numeric', year: from && year(from) === year(to) && d === from ? undefined : 'numeric' });
+    chip.innerHTML = `<span class="wl">Booking window</span><b>${from ? fmt(from) : 'Any date'} → ${fmt(to)}</b>`
+      + `<span class="wd">${daysBetween(to, from || to) + 1} days</span>`
+      + `<span class="wm ${S.dryRun ? 'watch' : 'book'}">${S.dryRun ? 'Just watching' : 'Auto-booking'}</span>`;
+  }
+
+  $('chips').innerHTML = cityList().map(n => `<span class="chip"><span class="key" style="--c:${colorOf(n)}"></span>${esc(n)}</span>`).join('');
+
+  const b = S.bookings[0];
+  const fresh = b && Date.now() - Date.parse(b.at) < 24 * 3600 * 1000;
+  $('bookedCard').hidden = !fresh;
+  if (fresh) $('bookedText').textContent = `🎉  ${b.text} (${ago(b.at)})`;
+}
+
+// ---------- requests (one row per request, with the pauses between them)
+const clockSec = iso => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+const REQ_NAMES = { dates: 'Dates', times: 'Time slots', 'sign-in': 'Sign-in', 'sign-in page': 'Sign-in page', 'sign-out': 'Sign-out', 'account check': 'Signed-out check', 'account page': 'Account page', book: 'Book', 'booking page': 'Booking page' };
+function reqLabel(what) {
+  const m = what.match(/^(sign-in page|sign-in|sign-out|account check|account page|booking page|dates|times|book)\s*(.*)$/);
+  if (!m) return esc(what);
+  const rest = m[2].replace(/\((\d+)\)/, '');
+  return `${REQ_NAMES[m[1]]}${rest ? ` <span class="muted">· ${esc(rest)}</span>` : ''}`;
+}
+// HTTP status as "302 Found", coloured by class: 2xx success, 3xx redirect, 4xx/5xx error
+const HTTP_TEXT = { 200: 'OK', 201: 'Created', 204: 'No Content', 301: 'Moved Permanently', 302: 'Found', 303: 'See Other',
+  304: 'Not Modified', 307: 'Temporary Redirect', 400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found',
+  406: 'Not Acceptable', 408: 'Request Timeout', 422: 'Unprocessable Content', 429: 'Too Many Requests', 500: 'Internal Server Error',
+  502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout' };
+const httpStatus = s => s ? `${s} ${HTTP_TEXT[s] || ''}`.trim() : '—';
+const httpClass = s => !s ? 'rq-bad' : s < 300 ? 'rq-ok' : s < 400 ? 'rq-redir' : 'rq-bad';
+const duration = ms => ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(2)} s`;
+
+// Expanded request rows (kept across refreshes) and their fetched details
+const openReqs = new Set(), reqDetails = new Map();
+const reqKey = r => `${r.at}|${r.method} ${r.what}`;
+const bytesText = n => n == null ? '' : n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} KB`;
+const clockMs = iso => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+
+// Open dates as mini calendars, one card per month: open days filled, the
+// earliest ringed, days in your window green, days before your appointment purple
+function dateChips(dates) {
+  const open = new Set(dates), first = dates[0];
+  const months = [];
+  for (let d = new Date(first.slice(0, 7) + '-01T00:00:00Z'); d.toISOString().slice(0, 7) <= dates[dates.length - 1].slice(0, 7); d.setUTCMonth(d.getUTCMonth() + 1)) {
+    months.push(new Date(d));
+  }
+  const cards = months.map(m => {
+    const y = m.getUTCFullYear(), mo = m.getUTCMonth();
+    const days = new Date(Date.UTC(y, mo + 1, 0)).getUTCDate(), lead = new Date(Date.UTC(y, mo, 1)).getUTCDay();
+    let count = 0, cells = '<span class="wd">S</span><span class="wd">M</span><span class="wd">T</span><span class="wd">W</span><span class="wd">T</span><span class="wd">F</span><span class="wd">S</span>';
+    cells += '<span></span>'.repeat(lead);
+    for (let day = 1; day <= days; day++) {
+      const iso = `${y}-${String(mo + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      if (!open.has(iso)) { cells += `<span class="cd">${day}</span>`; continue; }
+      count++;
+      const v = vsAppt(iso), cls = inWindow(iso) ? 'hit' : v !== null && v < 0 ? 'better' : '';
+      const tip = `${fmtDate(iso)} — open${inWindow(iso) ? ', in your window' : v !== null ? `, ${Math.abs(v)} days ${v < 0 ? 'before' : 'after'} your appointment` : ''}${iso === first ? ' (earliest)' : ''}`;
+      cells += `<span class="cd av ${cls}${iso === first ? ' first' : ''}" title="${esc(tip)}">${day}</span>`;
+    }
+    return `<div class="cal"><div class="ch"><b>${m.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' })}</b><span>${count ? `${count} open` : 'none open'}</span></div><div class="cg">${cells}</div></div>`;
+  }).join('');
+  return `<div class="cals">${cards}</div><div class="cal-key"><span><i class="k av"></i>Open</span><span><i class="k hit"></i>In your window</span><span><i class="k better"></i>Before your appointment</span><span><i class="k first"></i>Earliest</span></div>`;
+}
+
+function requestDetail(r) {
+  const d = reqDetails.get(reqKey(r));
+  const status = d?.status ?? r.status;
+  const rows = [
+    ['Request', d?.url ? `<code>${esc(r.method)} ${esc(d.url)}</code>` : `${esc(r.method)} · ${reqLabel(r.what)}`],
+    ['Status', r.error && !status ? '<span class="rq-bad">No response</span>' : `<span class="${httpClass(status)}">${httpStatus(status)}</span>`],
+    ['Duration', duration(r.ms)],
+    ['Completed', `${clockMs(r.at)} <span class="muted">(${esc(new Date(r.at).toISOString().replace('T', ' ').slice(0, 23))} UTC)</span>`],
+  ];
+  if (d === undefined) return `<dl class="rqd">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}<dt></dt><dd class="note">Loading…</dd></dl>`;
+  if (d.bytes) rows.push(['Response size', bytesText(d.bytes)]);
+  if (d.redirect) rows.push(['Location', `<code>${esc(d.redirect)}</code>`]);
+  if (d.dates) {
+    const inWin = d.dates.filter(inWindow).length, better = d.dates.filter(x => !inWindow(x) && vsAppt(x) !== null && vsAppt(x) < 0).length;
+    const n = d.dates.length;
+    rows.push(['Available dates', `<b class="${n ? '' : 'rq-slow'}">${n}</b>`]);
+    rows.push(['Earliest available', n
+      ? `<b>${fmtDate(d.dates[0])}</b>${vsAppt(d.dates[0]) !== null ? ` <span class="muted">· ${vsAppt(d.dates[0]) < 0 ? `${-vsAppt(d.dates[0])} days before` : `${vsAppt(d.dates[0])} days after`} your appointment</span>` : ''}`
+      : '<span class="rq-slow">None</span> <span class="muted">· the site returned no open dates</span>']);
+    if (n) {
+      rows.push(['Latest', fmtDate(d.dates[n - 1])]);
+      rows.push(['In your window', `<b class="${inWin ? 'good' : ''}">${inWin}</b>`]);
+      if (appt()) rows.push(['Before your appointment', `<b>${inWin + better}</b>`]);
+      rows.push(['', dateChips(d.dates)]);
+    }
+  }
+  if (d.times) {
+    rows.push(['Available time slots', `<b class="${d.times.length ? '' : 'rq-slow'}">${d.times.length}</b>`]);
+    if (d.times.length) rows.push(['', d.times.map(t => `<span class="dchip">${esc(t)}</span>`).join(' ')]);
+  }
+  if (d.error || r.error) rows.push(['Error', `<span class="rq-bad">${esc(d.error || r.error)}</span>`]);
+  if (d.preview) rows.push(['Response body', `<code>${esc(d.preview)}${d.preview.length >= 300 ? '…' : ''}</code>`]);
+  if (d.missing) rows.push(['', '<span class="note">Response details were not recorded for this request (recording started with a later version).</span>']);
+  return `<dl class="rqd">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
+}
+
+function toggleRequest(key) {
+  if (openReqs.has(key)) { openReqs.delete(key); return renderTable(); }
+  openReqs.add(key);
+  renderTable();
+  if (reqDetails.has(key)) return;
+  const [at, label] = [key.slice(0, key.indexOf('|')), key.slice(key.indexOf('|') + 1)];
+  fetch(`/api/request?label=${encodeURIComponent(label)}&at=${encodeURIComponent(at)}`).then(r => r.json())
+    .then(d => { reqDetails.set(key, d); renderTable(); })
+    .catch(() => { reqDetails.set(key, { missing: true }); renderTable(); });
+}
+
+// Expanded check rows and what the bot did for each (order, requests, pauses)
+const openChecks = new Set(), checkDetails = new Map();
+function toggleCheck(at) {
+  if (openChecks.has(at)) { openChecks.delete(at); return renderTable(); }
+  openChecks.add(at);
+  renderTable();
+  if (checkDetails.has(at)) return;
+  fetch(`/api/check?at=${encodeURIComponent(at)}`).then(r => r.json())
+    .then(d => { checkDetails.set(at, d); renderTable(); })
+    .catch(() => { checkDetails.set(at, { missing: true }); renderTable(); });
+}
+
+function requestRows(items) {
+  let html = '';
+  for (const r of items) {
+    if (r.kind === 'order') { html += `<tr class="rq-gap"><td class="num">${clockSec(r.at)}</td><td colspan="3">⇄ Order this check: ${r.cities.map(esc).join(' → ')}</td></tr>`; continue; }
+    if (r.kind === 'pause') { html += `<tr class="rq-gap"><td class="num">${clockSec(r.at)}</td><td colspan="3">⏸ Random pause ${r.secs.toFixed(1)}s before ${esc(r.what.replace(/\(\d+\)/, ''))}</td></tr>`; continue; }
+    if (r.kind !== 'req') continue;
+    const got = r.got ? ` <span class="${/^error|^0 /.test(r.got) ? 'rq-slow' : 'muted'}">· ${esc(r.got)}</span>` : '';
+    const result = (r.error ? `<span class="rq-bad">${r.status ? httpStatus(r.status) + ' · ' : ''}failed · ${esc(r.error)}</span>` : `<span class="${httpClass(r.status)}">${httpStatus(r.status)}</span>`) + got;
+    const key = reqKey(r), open = openReqs.has(key);
+    html += `<tr class="rq-row${open ? ' open' : ''}" data-rq="${esc(key)}" title="Click for details"><td class="tm num"><span class="caret">▸</span> ${clockSec(r.at)}</td><td><span class="rq-m">${esc(r.method)}</span>${reqLabel(r.what)}</td><td>${result}</td><td class="num ${r.ms > 3000 ? 'rq-slow' : 'dim'}">${duration(r.ms)}</td></tr>`;
+    if (open) html += `<tr class="rq-detail"><td colspan="4">${requestDetail(r)}</td></tr>`;
+  }
+  return html;
+}
+
+function checkDetail(at) {
+  const d = checkDetails.get(at);
+  if (d === undefined) return '<div class="ck-note">Loading…</div>';
+  const items = d.items || [];
+  if (!items.some(r => r.kind === 'req')) return '<div class="ck-note">No request details for this check — they are logged for checks made with a later version of the bot.</div>';
+  const n = items.filter(r => r.kind === 'req').length;
+  return `<div class="ck-head">${n} request${n === 1 ? '' : 's'} in this check · click one for its full details</div>`
+    + `<table class="act sub"><thead><tr><th>Time</th><th>Request</th><th>Result</th><th>Took</th></tr></thead><tbody>${requestRows(items)}</tbody></table>`;
+}
+
+// Icons for session events in the table (sign in, sign out, stop)
+const EVENT_ICONS = {
+  signin: '<svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>',
+  signout: '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
+  stop: '<svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><path d="M12 2v10"/></svg>',
+  booked: '<svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/><path d="M8.8 15l2.2 2.2 4.3-4.4"/></svg>',
+  found: '<svg viewBox="0 0 24 24"><path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>',
+};
+
+// The check in progress: each city's answer so far, and which city is being asked
+function liveCheck() {
+  if (!S.pid || S.phase !== 'checking') return null;
+  const reqs = S.requests || [], names = cityList(), found = {};
+  let i = reqs.length - 1;
+  for (; i >= 0 && reqs[i].kind !== 'rest'; i--) {
+    const r = reqs[i];
+    if (r.kind !== 'req' || !/^dates /.test(r.what)) continue;
+    const name = r.what.replace(/^dates /, '').replace(/\(\d+\)$/, '');
+    if (found[name]) continue;
+    const m = (r.got || '').match(/^(\d+) dates?(?:, earliest (\S+))?/);
+    found[name] = r.error || (r.got || '').startsWith('error') ? { err: true } : { count: m ? Number(m[1]) : 0, date: m?.[2] || null };
+  }
+  const plan = reqs.slice(i + 1).reverse().find(r => r.kind === 'order');
+  const order = [...(plan?.cities || []).filter(n => names.includes(n)), ...names.filter(n => !(plan?.cities || []).includes(n))];
+  return { found, asking: order.find(n => !found[n]) };
+}
+
+function liveRow(names, cols) {
+  const live = liveCheck();
+  if (!live) return '';
+  const before = Object.fromEntries((S.latest?.cities || []).map(c => [c.name, c.date]));
+  let total = 0;
+  const cells = names.map(n => {
+    const c = live.found[n];
+    if (!c) return n === live.asking
+      ? `<td class="c lv-ask" title="GET dates request in flight"><span class="spin sm"></span>Request in flight</td>`
+      : `<td class="c"><span class="skel" title="${esc(n)}: queued — not requested yet"></span></td>`;
+    if (c.err) return `<td class="c drop">error</td>`;
+    if (!c.date) return `<td class="c none lv-in">—</td>`;
+    total += c.count;
+    const moved = before[n] && before[n] !== c.date ? daysBetween(before[n], c.date) : 0;
+    const arr = moved > 0 ? `<span class="arr up">↑ ${moved}d</span>` : moved < 0 ? `<span class="arr dn">↓ ${-moved}d</span>` : '';
+    return `<td class="c lv-in ${inWindow(c.date) ? 'hit' : ''}"><span class="d num">${fmtDate(c.date)}</span><span class="n">×${c.count}</span>${arr}</td>`;
+  }).join('');
+  const done = Object.keys(live.found).length;
+  return `<tr class="inprog" title="Check in progress — ${done} of ${names.length} cities answered">`
+    + `<td class="tm"><span class="lv-pill"><span class="lv-dot"></span>Checking</span></td>${cells}`
+    + `<td class="dim num">${done ? total : ''}</td>`
+    + `<td class="dim num" title="${done} of ${names.length} cities answered">${done}/${names.length}</td></tr>`;
+}
+
+// ---------- checks table
+function renderTable() {
+  const names = cityList();
+  const items = [
+    ...S.checkLog.map((ch, i) => ({ type: 'check', at: ch.at, ch, prev: S.checkLog[i - 1] })),
+    ...S.events.map(e => ({ type: 'event', at: e.at, e })),
+  ].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+
+  // Collapse repeated identical events ("Signed in" ×3)
+  let merged = [];
+  for (const it of items) {
+    const last = merged[merged.length - 1];
+    if (it.type === 'event' && last?.type === 'event' && last.e.text === it.e.text) { last.n = (last.n || 1) + 1; continue; }
+    merged.push(it);
+  }
+  const changed = it => {
+    if (!it.prev) return true;
+    const before = Object.fromEntries(it.prev.cities.map(c => [c.name, c.date]));
+    return it.ch.cities.some(c => before[c.name] !== c.date) || it.ch.cities.some(c => inWindow(c.date));
+  };
+  if (tblFilter === 'changes') merged = merged.filter(it => it.type === 'event' ? !/^Signed in/.test(it.e.text) : changed(it));
+  if (tblFilter === 'events') merged = merged.filter(it => it.type === 'event');
+  merged.reverse();
+
+  const visible = merged.slice(0, showCount);
+  $('more').hidden = merged.length <= showCount;
+  const nChecks = merged.filter(i => i.type === 'check').length;
+  $('tblCount').textContent = `Showing ${visible.length} of ${merged.length} rows${tblFilter !== 'events' ? ` · ${nChecks} checks` : ''}`;
+  $('tblSub').textContent = S.latest ? `last ${ago(S.latest.at)}` : '';
+
+  const cols = names.length + 3;
+  let html = `<thead><tr><th>Time</th>${names.map(n => `<th><span class="key" style="--c:${colorOf(n)}"></span>${esc(n)}</th>`).join('')}<th>Open</th><th>Next</th></tr></thead><tbody>`;
+  let curDay = null, first = true;
+  const todayKey = dayKey(new Date().toISOString());
+  // The check in progress fills in city by city at the top
+  if (tblFilter !== 'events' && liveCheck()) {
+    curDay = todayKey;
+    html += `<tr class="day"><td colspan="${cols}">Today</td></tr>` + liveRow(names, cols);
+  }
+  for (const it of visible) {
+    const dk = dayKey(it.at);
+    if (dk !== curDay) { curDay = dk; html += `<tr class="day"><td colspan="${cols}">${dk === todayKey ? 'Today' : dk}</td></tr>`; }
+    if (it.type === 'event') {
+      const mark = it.e.icon ? `<span class="evic ic-${it.e.icon}">${EVENT_ICONS[it.e.icon]}</span>` : '<span class="evi"></span>';
+      html += `<tr class="ev ${it.e.kind}"><td class="tm num">${clock(it.at)}</td><td colspan="${cols - 1}"><span class="evt">${mark}${esc(it.e.text)}${it.n > 1 ? ` <span class="x">×${it.n}</span>` : ''}</span></td></tr>`;
+      continue;
+    }
+    const byName = Object.fromEntries(it.ch.cities.map(c => [c.name, c]));
+    const before = Object.fromEntries((it.prev?.cities || []).map(c => [c.name, c.date]));
+    let total = 0;
+    const cells = names.map(n => {
+      const c = byName[n];
+      if (!c) return `<td class="c none">·</td>`;
+      // every city empty at once = the soft-ban pattern; one city empty = its dates were taken
+      if (!c.date) return !before[n] ? `<td class="c none">—</td>`
+        : it.ch.cities.every(x => !x.date) ? `<td class="c drop">⚠ dropped to 0</td>`
+        : `<td class="c none" title="${esc(n)} had dates last check; they've all been taken">0 left</td>`;
+      total += c.count;
+      const moved = before[n] && before[n] !== c.date ? daysBetween(before[n], c.date) : 0;
+      const arr = moved > 0 ? `<span class="arr up">↑ ${moved}d</span>` : moved < 0 ? `<span class="arr dn">↓ ${-moved}d</span>` : '';
+      const better = !inWindow(c.date) && vsAppt(c.date) !== null && vsAppt(c.date) < 0;
+      return `<td class="c ${inWindow(c.date) ? 'hit' : better ? 'better' : ''}" title="${esc(vsAppt(c.date) === null ? '' : vsAppt(c.date) < 0 ? -vsAppt(c.date) + ' days earlier than your appointment' : vsAppt(c.date) + ' days later than your appointment')}"><span class="d num">${fmtDate(c.date)}</span><span class="n">×${c.count}</span>${arr}</td>`;
+    }).join('');
+    const ckOpen = openChecks.has(it.at);
+    html += `<tr class="ck-row${ckOpen ? ' open' : ''}${first && S.pid ? ' newest' : ''}" data-ck="${esc(it.at)}" title="Click to see this check's requests"><td class="tm num"><span class="caret">▸</span> ${clock(it.at)}</td>${cells}<td class="dim num">${total}</td><td class="dim num">${it.ch.next ? clock(it.ch.next) : '—'}</td></tr>`;
+    if (ckOpen) html += `<tr class="ck-detail"><td colspan="${cols}">${checkDetail(it.at)}</td></tr>`;
+    first = false;
+  }
+  if (!visible.length) html += `<tr><td colspan="${cols}" class="muted" style="padding:20px 14px">Nothing here yet.</td></tr>`;
+  $('act').innerHTML = html + '</tbody>';
+}
+
+// ---------- cities now
+function renderCities() {
+  const latest = Object.fromEntries((S.latest?.cities || []).map(c => [c.name, c]));
+  const prev = Object.fromEntries((S.previous?.cities || []).map(c => [c.name, c.date]));
+  $('citiesSub').textContent = S.latest ? clock(S.latest.at) : '';
+  $('cities').innerHTML = cityList().map(n => {
+    const c = latest[n];
+    const hit = c && inWindow(c.date);
+    let left = 'no check yet', right = '';
+    if (c && !c.date) left = 'nothing returned';
+    if (c?.date) {
+      left = `${c.count} open date${c.count === 1 ? '' : 's'}`;
+      const moved = prev[n] && prev[n] !== c.date ? daysBetween(prev[n], c.date) : 0;
+      if (hit) right = `<span class="good">✓ in your window</span>`;
+      else if (moved > 0) right = `<span class="up">↑ ${moved}d earlier</span>`;
+      else if (moved < 0) right = `<span class="dn">↓ ${-moved}d later</span>`;
+      else if (S.current) right = `${daysBetween(c.date, winTo())}d after window`;
+    }
+    const cmp = c?.date ? vsTag(c.date) : '';
+    return `<div class="crow ${hit ? 'hit' : ''}">
+      <div class="nm"><span class="key" style="--c:${colorOf(n)}"></span>${esc(n)}</div>
+      <div class="dt num ${c?.date ? '' : 'none'}">${c?.date ? fmtDate(c.date) : 'No dates'}</div>
+      <div class="ds"><span>${left}</span><span>${right}</span></div>
+      ${cmp ? `<div class="ds"><span>vs your appointment</span>${cmp}</div>` : ''}</div>`;
+  }).join('');
+}
+
+// ---------- chart: step lines of earliest date per city across checks
+let chartGeo = null;
+const HATCH = `<pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">`
+  + `<rect width="8" height="8" fill="var(--warn)" fill-opacity=".05"/><line x1="0" y1="0" x2="0" y2="8" stroke="var(--warn)" stroke-opacity=".22" stroke-width="2"/></pattern>`;
+function renderChart() {
+  const svg = $('chart'), wrap = $('chartWrap');
+  const names = cityList();
+  const cutoff = chartHours ? Date.now() - chartHours * 3600000 : 0;
+  const pts = S.checkLog.filter(c => Date.parse(c.at) >= cutoff);
+  $('legend').innerHTML = names.map(n => `<span><span class="key" style="--c:${colorOf(n)}"></span>${esc(n)}</span>`).join('');
+
+  const W = Math.max(320, wrap.clientWidth - 16), H = 260;
+  const m = { l: 76, r: 96, t: 14, b: 26 };
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('height', H);
+  const values = pts.flatMap(c => c.cities.filter(x => x.date).map(x => day(x.date))).filter(Number.isFinite);
+  const allEmpty = c => c.cities.length > 0 && c.cities.every(x => !x.date);
+  if (pts.length >= 2 && !values.length) {
+    const span = dur(Date.parse(pts[pts.length - 1].at) - Date.parse(pts[0].at));
+    svg.innerHTML = `<defs>${HATCH}</defs><rect x="0" y="0" width="${W}" height="${H}" fill="url(#hatch)" rx="8"/>`
+      + `<text x="${W / 2}" y="${H / 2 - 6}" text-anchor="middle" style="font-size:14px;font-weight:650;fill:var(--warn)">No city returned any dates in this range</text>`
+      + `<text x="${W / 2}" y="${H / 2 + 16}" text-anchor="middle">${pts.length} checks over ${span} all came back empty — the site's soft-ban pattern. Pausing for a few hours usually lifts it.</text>`;
+    chartGeo = null; $('chartNote').textContent = ''; return;
+  }
+  if (pts.length < 2) {
+    svg.innerHTML = `<text x="${W / 2}" y="${H / 2}" text-anchor="middle">Not enough checks in this range yet</text>`;
+    chartGeo = null; $('chartNote').textContent = ''; return;
+  }
+  // Equal spacing per check so overnight pauses don't squash the data; long gaps get a break mark
+  const N = pts.length;
+  const ap = appt() ? day(appt().date) : null;
+  let y0 = Math.min(...values, ...(ap ? [ap] : [])), y1 = Math.max(...values, ...(ap ? [ap] : []));
+  const pad = Math.max(15 * 86400000, (y1 - y0) * 0.08);
+  y0 -= pad; y1 += pad;
+  const XI = i => m.l + (W - m.l - m.r) * (N === 1 ? 0.5 : i / (N - 1));
+  const Y = d => m.t + (H - m.t - m.b) * (1 - (d - y0) / (y1 - y0));  // later dates higher, earlier lower
+
+  let g = `<defs>${HATCH}</defs>`;
+  // Shade runs of checks where every city came back empty (soft-ban pattern)
+  const half = N > 1 ? (XI(1) - XI(0)) / 2 : 0;
+  for (let i = 0; i < N; i++) {
+    if (!allEmpty(pts[i])) continue;
+    let j = i;
+    while (j + 1 < N && allEmpty(pts[j + 1])) j++;
+    const x1 = Math.max(m.l, XI(i) - half), x2 = Math.min(W - m.r, XI(j) + half);
+    g += `<rect x="${x1}" y="${m.t}" width="${Math.max(2, x2 - x1)}" height="${H - m.t - m.b}" fill="url(#hatch)"/>`;
+    if (x2 - x1 > 110) {
+      const cx = (x1 + x2) / 2, n = j - i + 1;
+      g += `<text x="${cx}" y="${m.t + (H - m.t - m.b) / 2 - 4}" text-anchor="middle" style="font-size:12px;font-weight:650;fill:var(--warn)">No dates returned</text>`;
+      g += `<text x="${cx}" y="${m.t + (H - m.t - m.b) / 2 + 12}" text-anchor="middle" style="font-size:11px">${n} check${n === 1 ? '' : 's'} · every city empty</text>`;
+    }
+    i = j;
+  }
+  // Y grid: month ticks, thinned to ≤5
+  const months = [];
+  const mt = new Date(y0); mt.setUTCDate(1); mt.setUTCMonth(mt.getUTCMonth() + 1);
+  while (mt.getTime() <= y1) { months.push(mt.getTime()); mt.setUTCMonth(mt.getUTCMonth() + 1); }
+  const step = Math.max(1, Math.ceil(months.length / 5));
+  months.filter((_, i) => i % step === 0).forEach(v => {
+    const y = Y(v);
+    g += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${y}" y2="${y}"/>`;
+    g += `<text x="${m.l - 10}" y="${y + 4}" text-anchor="end">${new Date(v).toLocaleDateString(undefined, { month: 'short', year: 'numeric', timeZone: 'UTC' })}</text>`;
+  });
+  // X ticks: ~6 checks, labelled with their time
+  const sameDay = new Date(pts[0].at).toDateString() === new Date(pts[N - 1].at).toDateString();
+  const nx = Math.min(6, N);
+  for (let k = 0; k < nx; k++) {
+    const i = Math.round(k * (N - 1) / Math.max(1, nx - 1));
+    const at = pts[i].at;
+    const label = sameDay ? clock(at) : new Date(at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    g += `<text x="${XI(i)}" y="${H - 6}" text-anchor="${k === 0 ? 'start' : k === nx - 1 ? 'end' : 'middle'}">${label}</text>`;
+  }
+  // Break marks where the bot wasn't checking for 30+ minutes
+  let lastLabelX = -Infinity;
+  for (let i = 1; i < N; i++) {
+    const gapMin = (Date.parse(pts[i].at) - Date.parse(pts[i - 1].at)) / 60000;
+    if (gapMin < 30) continue;
+    const x = (XI(i) + XI(i - 1)) / 2;
+    g += `<line x1="${x}" x2="${x}" y1="${m.t}" y2="${H - m.b}" stroke="var(--faint)" stroke-dasharray="2 3"/>`;
+    if (x - lastLabelX < 70) continue;
+    lastLabelX = x;
+    g += `<text x="${x}" y="${m.t + 10}" text-anchor="middle" style="font-size:10px">${gapMin >= 120 ? Math.round(gapMin / 60) + 'h' : Math.round(gapMin) + 'm'} pause</text>`;
+  }
+
+  if (ap) {
+    const y = Y(ap);
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y}" y2="${y}" stroke="var(--info)" stroke-width="6" stroke-opacity=".12"/>`;
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y}" y2="${y}" stroke="var(--info)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    g += `<text x="${m.l + 6}" y="${y - 6}" style="fill:var(--info);font-size:11px">Your appointment · ${esc(fmtDate(appt().date))}</text>`;
+  }
+  // Series (step-after; gaps where a city returned nothing)
+  const ends = [];
+  names.forEach(n => {
+    let d = '', prevY = null;
+    let last = null;
+    pts.forEach((c, i) => {
+      const v = c.cities.find(x => x.name === n)?.date;
+      const x = XI(i);
+      if (!v) { prevY = null; return; }
+      const y = Y(day(v));
+      d += prevY === null ? `M${x},${y}` : `H${x}V${y}`;
+      prevY = y; last = { x, y, v };
+    });
+    if (d) g += `<path class="ln" d="${d}" stroke="${colorOf(n)}"/>`;
+    if (last) ends.push({ n, ...last });
+  });
+  // Direct labels at the right, nudged apart to avoid collisions
+  ends.sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].ly = (ends[i - 1].ly ?? ends[i - 1].y) + 15;
+  ends.forEach(e => {
+    g += `<circle class="pt" cx="${e.x}" cy="${e.y}" r="4" fill="${colorOf(e.n)}"/>`;
+    g += `<text class="lbl" x="${W - m.r + 10}" y="${(e.ly ?? e.y) + 4}">${esc(e.n)}</text>`;
+  });
+  g += `<line class="xh" id="xh" y1="${m.t}" y2="${H - m.b}" visibility="hidden"/><g id="xhPts"></g>`;
+  g += `<rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" id="hit"/>`;
+  svg.innerHTML = g;
+  chartGeo = { pts, XI, Y, W, H, m, names };
+
+  // Where the window sits relative to the plotted range
+  if (S.current) {
+    const closest = Math.min(...values);
+    const gap = daysBetween(new Date(closest).toISOString().slice(0, 10), winTo());
+    const v = vsAppt(new Date(closest).toISOString().slice(0, 10));
+    $('chartNote').textContent = (gap > 0
+      ? `Your booking window ends ${fmtDate(winTo())} — ${gap} days before the earliest date seen in this range.`
+      : 'Dates in this range reached your booking window.')
+      + (v === null ? '' : v < 0 ? ` The earliest date seen was ${-v} days earlier than your appointment.` : ` Nothing earlier than your appointment showed up in this range.`);
+  }
+}
+
+function chartHover(ev) {
+  if (!chartGeo) return;
+  const svg = $('chart'), tip = $('tip');
+  const { pts, XI, Y, W, m, names } = chartGeo;
+  const r = svg.getBoundingClientRect();
+  const px = (ev.clientX - r.left) * (W / r.width);
+  let best = 0, bd = Infinity;
+  pts.forEach((c, i) => { const d = Math.abs(XI(i) - px); if (d < bd) { bd = d; best = i; } });
+  const c = pts[best], x = XI(best);
+  const xh = $('xh');
+  xh.setAttribute('x1', x); xh.setAttribute('x2', x); xh.setAttribute('visibility', 'visible');
+  $('xhPts').innerHTML = names.map(n => {
+    const v = c.cities.find(z => z.name === n)?.date;
+    return v ? `<circle class="pt" cx="${x}" cy="${Y(day(v))}" r="4.5" fill="${colorOf(n)}"/>` : '';
+  }).join('');
+  tip.hidden = false;
+  tip.innerHTML = `<div class="tt">${esc(new Date(c.at).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }))}</div>` +
+    names.map(n => {
+      const z = c.cities.find(q => q.name === n);
+      return `<div class="tr"><span class="key" style="--c:${colorOf(n)};width:12px;height:2px"></span><span>${esc(n)}</span><b class="num">${z?.date ? fmtDate(z.date) : '—'}</b></div>`;
+    }).join('') +
+    (appt() ? `<div class="tr" style="border-top:1px solid var(--line);margin-top:4px;padding-top:6px"><span class="key" style="--c:var(--info);width:12px;height:2px"></span><span>Your appointment</span><b class="num">${esc(fmtDate(appt().date))}</b></div>` : '');
+  const wr = $('chartWrap').getBoundingClientRect();
+  const left = ev.clientX - wr.left + 16;
+  tip.style.left = Math.min(left, wr.width - tip.offsetWidth - 8) + 'px';
+  tip.style.top = '16px';
+}
+function chartLeave() {
+  $('tip').hidden = true;
+  $('xh')?.setAttribute('visibility', 'hidden');
+  if ($('xhPts')) $('xhPts').innerHTML = '';
+}
+
+// ---------- openings / insights (fetched less often; it scans the whole history)
+let INS = null;
+async function loadInsights() {
+  try { INS = await (await fetch('/api/insights')).json(); renderInsights(); } catch {}
+}
+function renderInsights() {
+  if (!INS) return;
+  const I = INS;
+  $('insSub').textContent = I.since ? `from ${I.checks} checks since ${new Date(I.since).toLocaleDateString([], { month: 'short', day: 'numeric' })}` : 'no data yet';
+  const top = Object.entries(I.byCity).sort((a, b) => b[1] - a[1])[0];
+  $('istats').innerHTML = [
+    [I.total, 'openings found'],
+    [I.medianLastedMin !== null ? `${I.medianLastedMin} min` : '—', 'typical time before taken'],
+    [I.beatsAppt, 'earlier than your appointment'],
+    [top ? `${esc(top[0])}` : '—', top ? `most openings (${top[1]})` : 'most openings'],
+  ].map(([v, k]) => `<div class="istat"><div class="v num">${v}</div><div class="k">${k}</div></div>`).join('');
+
+  const maxO = Math.max(1, ...I.byHour);
+  const maxC = Math.max(1, ...I.checksByHour);
+  $('hours').innerHTML = I.byHour.map((n, h) => {
+    const tip = `${h}:00–${h}:59 — ${n} opening${n === 1 ? '' : 's'} in ${I.checksByHour[h]} checks`;
+    return `<div class="b ${n ? '' : 'zero'}" title="${tip}"><i style="height:${(100 * n / maxO).toFixed(1)}%"></i></div>`;
+  }).join('');
+  $('cov').innerHTML = I.checksByHour.map((c, h) => `<i class="${c === 0 ? '' : c / maxC > 0.4 ? 'c2' : 'c1'}" title="${h}:00 — ${c} checks"></i>`).join('');
+  $('hlabels').innerHTML = Array.from({ length: 24 }, (_, h) => `<span>${h % 3 === 0 ? (h === 0 ? '12a' : h < 12 ? h + 'a' : h === 12 ? '12p' : (h - 12) + 'p') : ''}</span>`).join('');
+  const dn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  $('days').innerHTML = I.byDay.map((n, d) => `<div class="${I.checksByDay[d] ? '' : 'nodata'}"><b>${I.checksByDay[d] ? n : '·'}</b>${dn[d]}</div>`).join('');
+
+  // Plain-English takeaway, honest about coverage
+  const covered = I.checksByHour.filter(c => c > 0).length;
+  const [rmin, rmax] = (I.refreshDelay || '').split('-').map(Number);
+  const avgWait = rmin ? ((rmin + (rmax || rmin)) / 2) / 60 : null;
+  let txt = '';
+  if (I.medianLastedMin !== null && avgWait) {
+    txt += I.medianLastedMin > avgWait * 1.5
+      ? `Openings typically last <b>~${I.medianLastedMin} min</b> and you check every <b>~${avgWait.toFixed(0)} min</b> — you should catch most of them. `
+      : `Openings typically last <b>~${I.medianLastedMin} min</b> but you check every <b>~${avgWait.toFixed(0)} min</b> — some will disappear between checks. `;
+  }
+  txt += covered < 12
+    ? `The bot has only checked during <b>${covered} of 24 hours</b>, so the hour pattern isn't reliable yet — let it run across the day to see when cancellations really happen.`
+    : `Busiest hour so far: <b>${I.byHour.indexOf(Math.max(...I.byHour))}:00</b>.`;
+  $('insight').innerHTML = txt;
+
+  const a = I.appointment;
+  $('best').innerHTML = Object.entries(I.best).sort((x, y) => x[1].date.localeCompare(y[1].date)).map(([n, b]) => {
+    const v = a ? daysBetween(b.date, a.date) : null;
+    const tag = v === null ? '' : v < 0 ? `<span class="vs e">${-v}d earlier than yours</span>` : v === 0 ? '<span class="vs l">same as yours</span>' : `<span class="vs l">${v}d later</span>`;
+    return `<div class="bestrow"><span class="nm"><span class="key" style="--c:${colorOf(n)}"></span>${esc(n)}</span><span><b class="num">${fmtDate(b.date)}</b> ${tag}</span></div>`;
+  }).join('') || '<div class="muted">No dates seen yet.</div>';
+
+  $('olist').innerHTML = I.openings.map(o => `<li class="${o.beatsAppt ? 'beat' : ''}">
+      <span class="w num">${esc(new Date(o.at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }))}</span>
+      <span><span class="key" style="--c:${colorOf(o.city)};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(o.city)} <span class="d num">${fmtDate(o.date)}</span> <span class="muted" style="font-size:12px">↑${o.daysEarlier}d</span></span>
+      <span class="m">${o.lastedMin === null ? 'still open' : `gone in ${o.lastedMin} min`}</span></li>`).join('') || '<li class="muted">None yet.</li>';
+}
+
+// ---------- sound + desktop notification for big events
+const ALERT_KINDS = new Set(['good', 'early']);
+let alertsOn = false, lastAlertAt = null;
+try { alertsOn = localStorage.getItem('alertsOn') === '1'; lastAlertAt = localStorage.getItem('lastAlertAt'); } catch {}
+const ICONS = {
+  sun: '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  moon: '<svg class="ico" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  auto: '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>',
+};
+function setTool(id, icon, tip, on) {
+  const b = $(id);
+  b.innerHTML = ICONS[icon];
+  b.dataset.tip = tip;
+  b.setAttribute('aria-label', tip);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.classList.toggle('on', on);
+}
+function renderAlertsBtn() {
+  $('prefAlerts').checked = alertsOn;
+  const denied = alertsOn && 'Notification' in window && Notification.permission === 'denied';
+  $('prefHint').textContent = denied ? 'Desktop notifications are blocked for this page in your browser settings — you\'ll still get the chime.' : '';
+}
+let audioCtx = null;
+function audio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+document.addEventListener('pointerdown', () => { try { audio(); } catch {} }, { once: true });
+
+// Short glassy "ding" for "a check just finished" (~0.25s, iPhone-notification style)
+function bell(ctx, freq, at, peak, len) {
+  // Bell = fundamental + softer overtone, instant attack, fast exponential decay
+  [[freq, peak], [freq * 2.76, peak * 0.25]].forEach(([f, gpk]) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(gpk, at + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+    o.connect(g).connect(ctx.destination); o.start(at); o.stop(at + len + 0.02);
+  });
+}
+function tick() {
+  try {
+    const ctx = audio(), t = ctx.currentTime + 0.01;
+    bell(ctx, 1318.5, t, 0.12, 0.18);        // E6
+    bell(ctx, 1975.5, t + 0.05, 0.10, 0.22); // B6
+  } catch {}
+}
+let tickOn = true, lastCheckAt = null;
+try { tickOn = localStorage.getItem('tickOn') !== '0'; } catch {}
+function renderTickBtn() {
+  $('prefTick').checked = tickOn;
+}
+function checkTick() {
+  const at = S.latest?.at || null;
+  if (lastCheckAt === null) { lastCheckAt = at || ''; return; } // don't tick for the check already on screen
+  if (!at || at === lastCheckAt) return;
+  lastCheckAt = at;
+  if (tickOn && S.pid) tick();
+}
+$('prefTick').addEventListener('change', () => {
+  tickOn = $('prefTick').checked;
+  try { localStorage.setItem('tickOn', tickOn ? '1' : '0'); } catch {}
+  renderTickBtn();
+  if (tickOn) tick();
+});
+renderTickBtn();
+
+// ---------- theme: auto (system) → light → dark
+const THEMES = [['auto', 'auto', 'Auto'], ['light', 'sun', 'Light'], ['dark', 'moon', 'Dark']];
+const nextTheme = cur => THEMES[(THEMES.findIndex(t => t[0] === cur) + 1) % THEMES.length];
+let theme = 'auto';
+try { theme = localStorage.getItem('theme') || 'auto'; } catch {}
+function applyTheme() {
+  if (theme === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+  // The icon shows the theme a click switches to; the tooltip also names the current one
+  const cur = THEMES.find(x => x[0] === theme) || THEMES[0], nxt = nextTheme(cur[0]);
+  setTool('themeBtn', nxt[1], `Switch to ${nxt[2]}${nxt[0] === 'auto' ? ' (follow your system)' : ''} — now ${cur[2]}`, false);
+}
+$('themeBtn').addEventListener('click', () => {
+  theme = nextTheme(theme)[0];
+  try { localStorage.setItem('theme', theme); } catch {}
+  applyTheme();
+});
+applyTheme();
+
+// Booking fanfare (~1.8s): sparkly run up, then a punchy "ta-DAAA!" major chord
+// with a brassy filter swell and vibrato, finished with a twinkle on top.
+function brass(ctx, out, freq, at, len, peak) {
+  const o = ctx.createOscillator(), o2 = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  const vib = ctx.createOscillator(), vibAmt = ctx.createGain();
+  o.type = 'sawtooth'; o2.type = 'triangle';
+  o.frequency.value = freq; o2.frequency.value = freq * 1.003;          // slight detune = fuller
+  vib.frequency.value = 5.5; vibAmt.gain.value = freq * 0.006;         // gentle vibrato
+  vib.connect(vibAmt); vibAmt.connect(o.frequency); vibAmt.connect(o2.frequency);
+  f.type = 'lowpass'; f.Q.value = 1;
+  f.frequency.setValueAtTime(700, at);
+  f.frequency.exponentialRampToValueAtTime(4200, at + 0.09);           // brassy "blat" opening
+  f.frequency.exponentialRampToValueAtTime(1800, at + len);
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(peak, at + 0.025);
+  g.gain.setValueAtTime(peak, at + Math.min(0.2, len * 0.4));
+  g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+  o.connect(f); o2.connect(f); f.connect(g); g.connect(out);
+  [o, o2, vib].forEach(x => { x.start(at); x.stop(at + len + 0.05); });
+}
+function pluck(ctx, out, freq, at, peak) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'triangle'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.exponentialRampToValueAtTime(peak, at + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + 0.16);
+  o.connect(g).connect(out); o.start(at); o.stop(at + 0.18);
+}
+function successSound() {
+  try {
+    const ctx = audio(), t = ctx.currentTime + 0.03;
+    const out = ctx.createGain(); out.gain.value = 0.9;
+    const comp = ctx.createDynamicsCompressor();                      // keeps the big chord from clipping
+    out.connect(comp).connect(ctx.destination);
+    // 1) quick sparkly run up: C5 E5 G5 C6 E6
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => pluck(ctx, out, f, t + i * 0.055, 0.16));
+    // 2) "ta" — short G major
+    const ta = t + 0.32;
+    [392, 493.88, 587.33].forEach(f => brass(ctx, out, f, ta, 0.13, 0.05));
+    // 3) "DAAA!" — big C major, held and swelling
+    const da = t + 0.47;
+    [261.63, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => brass(ctx, out, f, da, 1.25, i === 0 ? 0.05 : 0.06));
+    // 4) twinkle on top as it rings: G6 C7 E7 G7
+    [1567.98, 2093, 2637, 3136].forEach((f, i) => bell(ctx, f, da + 0.12 + i * 0.07, 0.05, 0.5));
+  } catch {}
+}
+
+function chime() {
+  try {
+    const ctx = audio();
+    [880, 1175, 1568].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.frequency.value = f; o.type = 'sine';
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + i * 0.18);
+      g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + i * 0.18 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.18 + 0.4);
+      o.connect(g).connect(ctx.destination); o.start(ctx.currentTime + i * 0.18); o.stop(ctx.currentTime + i * 0.18 + 0.45);
+    });
+  } catch {}
+}
+function checkAlerts() {
+  const fresh = S.events.filter(e => ALERT_KINDS.has(e.kind) && (!lastAlertAt || e.at > lastAlertAt));
+  const newest = S.events.length ? S.events[S.events.length - 1].at : null;
+  if (lastAlertAt === null) { lastAlertAt = newest || new Date().toISOString(); try { localStorage.setItem('lastAlertAt', lastAlertAt); } catch {} return; }
+  if (!fresh.length) return;
+  lastAlertAt = fresh[fresh.length - 1].at;
+  try { localStorage.setItem('lastAlertAt', lastAlertAt); } catch {}
+  loadInsights();
+  // A booking always gets the fanfare (unless every sound is off); other alerts follow the switch
+  const booked = fresh.some(e => e.text.startsWith('Booked '));
+  if (booked && (alertsOn || tickOn)) successSound();
+  if (!alertsOn) return;
+  if (!booked) chime();
+  if ('Notification' in window && Notification.permission === 'granted') {
+    for (const e of fresh.slice(-3)) new Notification('US Visa Bot', { body: e.text, tag: e.at, icon: document.querySelector('link[rel=icon]').href });
+  }
+}
+$('prefAlerts').addEventListener('change', async () => {
+  alertsOn = $('prefAlerts').checked;
+  if (alertsOn && 'Notification' in window && Notification.permission === 'default') await Notification.requestPermission();
+  try { localStorage.setItem('alertsOn', alertsOn ? '1' : '0'); } catch {}
+  renderAlertsBtn();
+  if (alertsOn) successSound(); // lets you hear the booking sound (and unlocks audio in the browser)
+});
+renderAlertsBtn();
+
+// ---------- controls
+// Date the running bot booked, if any: from then on it only books earlier than that
+function bookedThisRun() {
+  const b = S?.pid && S.startedAt && S.bookings?.find(e => Date.parse(e.at) >= Date.parse(S.startedAt));
+  return b ? b.text.match(/^Booked (\S+)/)?.[1] : null;
+}
+function renderSummary() {
+  const from = $('from').value, to = $('to').value, watch = $('mWatch').checked;
+  const where = cityList().join(', ') || 'your cities';
+  if (!from || !to) { $('summary').textContent = 'Pick both dates.'; return; }
+  if (from > to) { $('summary').innerHTML = '<b>“From” must be on or before “To”.</b>'; return; }
+  const w = $('winWarn'), a = appt();
+  w.hidden = !(a && to >= a.date) || !!bookedThisRun();
+  if (!w.hidden) w.textContent = `⚠ "To" is on or after your appointment (${fmtDate(a.date)}) — the bot could move you to a later date. Set "To" before ${fmtDate(a.date)}.`;
+  $('summary').innerHTML = (watch ? 'Will <b>watch</b> for dates ' : 'Will <b>book the first open date</b> ')
+    + `from <b>${fmtDate(from)}</b> to <b>${fmtDate(to)}</b> in ${esc(where)}`
+    + (watch ? ' — nothing gets booked.' : '. Your current appointment gets replaced.');
+}
+// When stopped, the form shows the window saved in .env (BOOK_FROM / BOOK_TO /
+// BOOK_MODE, written on every Start), so a Stop or reload doesn't lose it
+let formRestored = false;
+function restoreForm() {
+  const w = S.window;
+  if (!w?.to) return false;
+  $('from').value = w.from || '';
+  $('to').value = w.to;
+  (w.mode === 'watch' ? $('mWatch') : $('mBook')).checked = true;
+  return true;
+}
+function renderControls() {
+  const running = !!S.pid;
+  if (running && !formSynced && S.current) {
+    $('from').value = winFrom() || '';
+    $('to').value = winTo();
+    (S.dryRun ? $('mWatch') : $('mBook')).checked = true;
+    formSynced = true;
+  }
+  if (!running) formSynced = false;
+  if (!running && !formRestored) {
+    formRestored = true;
+    if (!restoreForm() && S.current) {
+      $('from').value = winFrom() || $('from').value;
+      $('to').value = winTo();
+    }
+  }
+  for (const id of ['from', 'to', 'mBook', 'mWatch']) $(id).disabled = running;
+  $('startBtn').hidden = running;
+  $('stopBtn').hidden = !running;
+  renderSummary();
+  // Newest at the bottom, kept in view unless you've scrolled up to read
+  const pre = $('log');
+  pre.textContent = S.log.join('\n');
+  if (logPinned) requestAnimationFrame(() => { pre.scrollTop = pre.scrollHeight; });
+}
+
+function render() { if (!S) return; renderTop(); renderKpis(); renderTable(); renderCities(); renderChart(); renderControls(); checkAlerts(); checkTick(); }
+
+async function refresh() {
+  try { S = await (await fetch('/api/status')).json(); render(); }
+  catch { if (quitting) return; $('headline').textContent = 'Dashboard offline'; $('barState').textContent = 'Offline'; $('dot').className = $('barDot').className = 'dot bad'; }
+}
+async function post(url, body) {
+  $('msg').textContent = '';
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const j = await r.json();
+  if (j.error) $('msg').textContent = j.error;
+  setTimeout(refresh, 1500);
+}
+
+// ---------- events
+for (const id of ['from', 'to', 'mBook', 'mWatch']) $(id).addEventListener('input', renderSummary);
+$('ctl').addEventListener('submit', e => {
+  e.preventDefault();
+  const from = $('from').value, to = $('to').value, dryRun = $('mWatch').checked;
+  if (from > to) { $('msg').textContent = '“From” must be on or before “To”.'; return; }
+  if (!dryRun && appt() && to >= appt().date && !confirm(`Warning: "To" (${fmtDate(to)}) is on or after your current appointment (${fmtDate(appt().date)}). The bot could move you LATER. Start anyway?`)) return;
+  if (!dryRun && !confirm(`Start auto-booking?\n\nThe bot will replace your appointment with the first open date from ${fmtDate(from)} to ${fmtDate(to)}.`)) return;
+  // "To" is inclusive in the UI; the bot wants the first day after the window
+  post('/api/start', { min: from, current: addDays(to, 1), dryRun });
+});
+const stop = () => { if (confirm('Stop the bot?')) post('/api/stop'); };
+$('stopBtn').addEventListener('click', stop);
+$('stopTop').addEventListener('click', stop);
+// ---------- settings drawer
+function rateHint() {
+  const n = [...document.querySelectorAll('#setCities input:checked')].length;
+  const lo = Math.max(60, Number($('setMin').value) || 0), hi = Math.max(lo, Number($('setMax').value) || 0);
+  const perHour = n * 3600 / ((lo + hi) / 2);
+  const cap = Number($('setCap').value) || 0;
+  $('setRate').innerHTML = `≈ <b>${Math.round(perHour)} requests/hour</b> with ${n} cit${n === 1 ? 'y' : 'ies'}.`;
+  $('setCapHint').innerHTML = perHour ? `At that rate the cap lasts about <b>${(cap / perHour).toFixed(1)} hours</b> a day.` : '';
+}
+const settingsOpen = () => $('drawer').classList.contains('open');
+function showDrawer(on) {
+  $('drawer').classList.toggle('open', on);
+  $('scrim').classList.toggle('open', on);
+  $('drawer').inert = !on;                 // closed drawer can't be tabbed into
+  $('openSettings').setAttribute('aria-expanded', on ? 'true' : 'false');
+  if (on) setTimeout(() => $('drawer').focus({ preventScroll: true }), 50);
+}
+async function openSettings(on) {
+  if (!on) { showDrawer(false); return; }
+  $('setMsg').textContent = ''; $('notifyMsg').textContent = '';
+  // Load first so the panel slides in already filled
+  const st = await (await fetch('/api/settings')).json();
+  $('setCities').innerHTML = st.cities.map(c => `<label><input type="checkbox" value="${esc(c.id)}" ${c.on ? 'checked' : ''}>${esc(c.name)}</label>`).join('');
+  $('setMin').value = st.refreshMin; $('setMax').value = st.refreshMax;
+  $('setCap').value = st.dailyCap; $('setTopic').value = st.ntfyTopic;
+  $('prefAutostart').checked = !!st.autostart;
+  $('autostartHint').textContent = '';
+  rateHint();
+  showDrawer(true);
+}
+$('openSettings').addEventListener('click', () => openSettings(!settingsOpen()));
+$('prefAutostart').addEventListener('change', async () => {
+  const on = $('prefAutostart').checked;
+  $('autostartHint').textContent = on ? 'Turning on…' : 'Turning off…';
+  try {
+    const r = await fetch('/api/autostart', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on }) });
+    const j = await r.json();
+    if (j.error) throw new Error(j.error);
+    $('prefAutostart').checked = j.autostart;
+    $('autostartHint').innerHTML = j.autostart
+      ? '<span class="okmsg">On — the dashboard will start each time you log in.</span>'
+      : '<span class="okmsg">Off — it won’t start at login anymore.</span>';
+  } catch (e) {
+    $('prefAutostart').checked = !on;
+    $('autostartHint').textContent = 'Couldn’t change it: ' + e.message;
+  }
+});
+
+// ---------- quit the dashboard (optionally stopping the bot too)
+let quitting = false;
+$('quitBtn').addEventListener('click', async () => {
+  if (!confirm('Quit the dashboard?')) return;
+  let stopBot = false;
+  if (S?.pid) stopBot = confirm('The bot is running.\n\nOK = stop the bot too\nCancel = keep it running in the background');
+  quitting = true;
+  let botStopped = false;
+  try {
+    const r = await fetch('/api/quit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stopBot }) });
+    botStopped = (await r.json()).botStopped;
+  } catch {}
+  $('closedMsg').textContent = botStopped ? 'The bot has been stopped too.'
+    : S?.pid ? 'The bot is still running in the background — open the dashboard again to see it or stop it.'
+    : 'The bot is not running.';
+  $('closedScreen').hidden = false;
+});
+$('scrim').addEventListener('click', () => openSettings(false));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && settingsOpen()) openSettings(false); });
+$('setForm').addEventListener('input', rateHint);
+$('setForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = {
+    cities: [...document.querySelectorAll('#setCities input:checked')].map(i => i.value),
+    refreshMin: $('setMin').value, refreshMax: $('setMax').value,
+    dailyCap: $('setCap').value, ntfyTopic: $('setTopic').value,
+  };
+  const r = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (j.error) { $('setMsg').textContent = j.error; return; }
+  $('setMsg').innerHTML = `<span class="okmsg">Saved${j.restartNeeded ? ' — applies at the bot’s next check' : ''}.</span>`;
+  refresh();
+});
+$('testNotify').addEventListener('click', async () => {
+  $('notifyMsg').textContent = 'Sending…';
+  const r = await fetch('/api/test-notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  const j = await r.json();
+  $('notifyMsg').textContent = j.error ? (j.error + (j.error.includes('topic') ? ' — save a topic first.' : '')) : 'Sent — check your phone.';
+});
+
+function openApptEdit(on) {
+  $('apptForm').hidden = !on; $('apptView').hidden = on; $('apptEditBtn').hidden = on;
+  if (!on) return;
+  const a = appt();
+  $('apptDate').value = a?.date || '';
+  $('apptTime').value = a?.time || '';
+  $('apptCity').innerHTML = ['', ...cityList()].map(n => `<option ${a?.city === n ? 'selected' : ''}>${esc(n)}</option>`).join('');
+}
+$('apptEditBtn').addEventListener('click', () => openApptEdit(true));
+$('apptCancel').addEventListener('click', () => openApptEdit(false));
+$('apptForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  await post('/api/appointment', { date: $('apptDate').value, time: $('apptTime').value.trim(), city: $('apptCity').value });
+  openApptEdit(false);
+});
+$('apptReset').addEventListener('click', async () => { await post('/api/appointment', { date: null }); openApptEdit(false); });
+$('more').addEventListener('click', () => { showCount += 60; renderTable(); });
+$('act').addEventListener('click', e => {
+  const rq = e.target.closest('tr.rq-row');
+  if (rq) return toggleRequest(rq.dataset.rq);
+  const ck = e.target.closest('tr.ck-row');
+  if (ck) toggleCheck(ck.dataset.ck);
+});
+// The raw log sticks to the newest line; scrolling up pauses that until you scroll back down
+let logPinned = true;
+$('log').addEventListener('scroll', () => { const p = $('log'); logPinned = p.scrollHeight - p.scrollTop - p.clientHeight < 40; });
+$('logBox').addEventListener('toggle', () => {
+  if (!$('logBox').open) return;
+  logPinned = true;
+  requestAnimationFrame(() => { $('log').scrollTop = $('log').scrollHeight; });
+});
+$('tblFilter').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  tblFilter = b.dataset.f; showCount = 40;
+  for (const x of $('tblFilter').children) x.classList.toggle('on', x === b);
+  renderTable();
+});
+$('chartRange').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  chartHours = Number(b.dataset.r);
+  for (const x of $('chartRange').children) x.classList.toggle('on', x === b);
+  renderChart();
+});
+$('chart').addEventListener('pointermove', chartHover);
+$('chart').addEventListener('pointerleave', chartLeave);
+window.addEventListener('resize', () => S && renderChart());
+
+// Starting window: tomorrow through 90 days out
+{
+  const today = new Date().toISOString().slice(0, 10);
+  if (!$('from').value) $('from').value = addDays(today, 1);
+  if (!$('to').value) $('to').value = addDays(today, 90);
+}
+
+refresh();
+loadInsights();
+setInterval(refresh, 5000);
+setInterval(() => { if (S?.phase === 'checking') refresh(); }, 2000); // faster while a check is filling in
+setInterval(loadInsights, 60000);
+setInterval(() => S && renderTop(), 1000);  // tick the countdown every second
+</script>
+</body>
+</html>
