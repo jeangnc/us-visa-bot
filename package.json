@@ -17,5 +17,6 @@
     "commander": "^14.0.0",
     "dotenv": "^16.4.7",
     "node-fetch": "^3.3.0"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

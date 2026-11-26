@@ -5,7 +5,7 @@ export class Bot {
   constructor(config, options = {}) {
     this.config = config;
     this.dryRun = options.dryRun || false;
-    this.client = new VisaHttpClient(this.config.countryCode, this.config.email, this.config.password);
+    this.client = new VisaHttpClient(this.config.locale, this.config.email, this.config.password);
   }
 
   async initialize() {
